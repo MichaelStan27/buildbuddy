@@ -1,5 +1,7 @@
 package com.buildbuddy.domain.user.controller;
 
+import com.buildbuddy.domain.user.dto.request.UserRequestDto;
+import com.buildbuddy.domain.user.dto.response.UserResponseDto;
 import com.buildbuddy.domain.user.service.UserService;
 import com.buildbuddy.jsonresponse.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,10 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -26,10 +25,22 @@ public class UserController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
         log.info("param: {}", username);
 
-        DataResponse<String> response = userService.getUserByUsername(username);
+        DataResponse<UserResponseDto> response = userService.getUserByUsername(username);
 
         log.info("Success Executing Request on {}", request.getServletPath());
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<Object> register(@RequestBody UserRequestDto userDto,
+            HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+        log.info("param: {}", userDto.getUsername());
+
+        DataResponse<UserResponseDto> response = userService.createUser(userDto);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.buildbuddy.jsonresponse;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 public class DataResponse<T> {
 
     @JsonProperty(value = "timestamp")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 
     @JsonProperty(value = "httpStatus")

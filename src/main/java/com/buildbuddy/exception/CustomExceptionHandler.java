@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -22,7 +23,7 @@ public class CustomExceptionHandler {
 
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
 
-        if(e instanceof BadRequestException)
+        if(e instanceof BadRequestException || e instanceof UsernameNotFoundException)
             httpStatus = HttpStatus.BAD_REQUEST;
 
         ErrorResponse error = ErrorResponse.builder()
