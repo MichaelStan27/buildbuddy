@@ -30,7 +30,6 @@ public class SecurityConfig {
                         .requestMatchers(allowedPathList).permitAll()
                         .anyRequest().authenticated()
                 )
-                .csrf(AbstractHttpConfigurer::disable)
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")

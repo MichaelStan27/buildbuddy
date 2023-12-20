@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,8 @@ public class CustomExceptionHandler {
 
         if(e instanceof BadRequestException || e instanceof UsernameNotFoundException || e instanceof BadCredentialsException)
             httpStatus = HttpStatus.BAD_REQUEST;
+        else if(e instanceof AccessDeniedException)
+            httpStatus = HttpStatus.FORBIDDEN;
 
         ErrorResponse error = ErrorResponse.builder()
                 .exceptionClass(e.getClass().toString())
