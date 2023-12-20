@@ -28,7 +28,6 @@ public class SecurityConfig {
                         .requestMatchers(allowedPathList).permitAll()
                         .anyRequest().authenticated()
                 )
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin((form) -> form
                         .loginPage("/login")
