@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.user.controller;
 
 import com.buildbuddy.domain.user.service.UserService;
+import com.buildbuddy.jsonresponse.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,10 @@ public class UserController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
         log.info("param: {}", username);
 
-        String response = userService.getUserByUsername(username);
+        DataResponse<String> response = userService.getUserByUsername(username);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
 }
