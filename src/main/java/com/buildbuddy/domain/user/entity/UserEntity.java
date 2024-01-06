@@ -1,15 +1,17 @@
 package com.buildbuddy.domain.user.entity;
 
+import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import java.util.List;
 
 @Data
 @Entity
@@ -17,6 +19,7 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
     @Id
@@ -42,7 +45,11 @@ public class UserEntity {
     @Column(name = "gender")
     private String gender;
 
+    @CreatedDate
     @Column(name = "created_time")
     private LocalDateTime createdTime;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private List<ThreadEntity> threads;
 
 }
