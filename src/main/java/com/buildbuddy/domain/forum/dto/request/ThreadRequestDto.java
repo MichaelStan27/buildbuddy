@@ -6,11 +6,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Optional;
+
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ThreadRequestDto {
+
+    private Integer id;
 
     private String post;
 

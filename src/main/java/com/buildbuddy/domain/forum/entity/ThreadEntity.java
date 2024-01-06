@@ -2,10 +2,7 @@ package com.buildbuddy.domain.forum.entity;
 
 import com.buildbuddy.domain.user.entity.UserEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -30,7 +27,7 @@ public class ThreadEntity {
 
     @CreatedBy
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", updatable = false)
     private UserEntity user;
 
     @Column(name = "post")

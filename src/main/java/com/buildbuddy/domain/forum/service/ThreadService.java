@@ -24,9 +24,20 @@ public class ThreadService {
     public DataResponse<ThreadResponseDto> save(ThreadRequestDto threadDto){
         log.info("thread: {}", threadDto);
 
-        ThreadEntity thread = ThreadRequestDto.convertToEntity(threadDto);
+        Integer id = threadDto.getId();
+        ThreadEntity thread = null;
 
-        thread = threadRepository.saveAndFlush(thread);
+        if(id != null){
+            thread = threadRepository.findByThreadId(id).orElseThrow(() -> new RuntimeException("Post Not Found"));
+            thread.setPost(threadDto.getPost());
+        }
+        else{
+            thread = ThreadRequestDto.convertToEntity(threadDto);
+        }
+
+        log.info("saving...");
+        threadRepository.saveAndFlush(thread);
+        log.info("saved...");
 
         ThreadResponseDto data = ThreadResponseDto.builder()
                 .post(thread.getPost())
