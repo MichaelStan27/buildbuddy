@@ -27,7 +27,7 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        log.info("allowed list: {}", allowedPathList);
+        log.info("allowed path: {}", allowedPathList.length);
         http
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(allowedPathList).permitAll()
