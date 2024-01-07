@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ThreadResponseDto {
 
+    @JsonProperty(value = "threadId")
+    private Integer threadId;
+
     @JsonProperty(value = "post")
     private String post;
 
@@ -32,6 +35,7 @@ public class ThreadResponseDto {
 
     public static ThreadResponseDto convertToDto(ThreadEntity entity){
         return ThreadResponseDto.builder()
+                .threadId(entity.getId())
                 .post(entity.getPost())
                 .username(entity.getUser().getUsername())
                 .createdTime(entity.getCreatedTime())
