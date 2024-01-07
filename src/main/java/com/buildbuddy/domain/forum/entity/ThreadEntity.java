@@ -1,6 +1,8 @@
 package com.buildbuddy.domain.forum.entity;
 
 import com.buildbuddy.domain.user.entity.UserEntity;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedBy;

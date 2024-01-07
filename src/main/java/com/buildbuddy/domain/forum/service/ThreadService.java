@@ -1,9 +1,12 @@
 package com.buildbuddy.domain.forum.service;
 
+import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
 import com.buildbuddy.domain.forum.dto.response.ThreadResponseDto;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import com.buildbuddy.domain.forum.repository.ThreadRepository;
+import com.buildbuddy.domain.user.entity.UserEntity;
+import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +21,9 @@ import java.time.LocalDateTime;
 public class ThreadService {
 
     @Autowired
+    private AuditorAwareImpl audit;
+
+    @Autowired
     private ThreadRepository threadRepository;
 
     @Transactional
@@ -28,7 +34,10 @@ public class ThreadService {
         ThreadEntity thread = null;
 
         if(id != null){
-            thread = threadRepository.findByThreadId(id).orElseThrow(() -> new RuntimeException("Post Not Found"));
+            UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() ->  new BadRequestException("Request not authenticated"));
+            log.info("current authenticated user: {}", currentUser.getUsername());
+
+            thread = threadRepository.findByIdAndUserId(id, currentUser.getId()).orElseThrow(() -> new BadRequestException("Post Not Found"));
             thread.setPost(threadDto.getPost());
         }
         else{

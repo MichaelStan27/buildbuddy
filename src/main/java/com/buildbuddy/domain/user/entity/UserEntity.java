@@ -1,6 +1,9 @@
 package com.buildbuddy.domain.user.entity;
 
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,8 +51,4 @@ public class UserEntity {
     @CreatedDate
     @Column(name = "created_time")
     private LocalDateTime createdTime;
-
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
-    private List<ThreadEntity> threads;
-
 }
