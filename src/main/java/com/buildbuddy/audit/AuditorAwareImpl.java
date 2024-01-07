@@ -31,6 +31,6 @@ public class AuditorAwareImpl implements AuditorAware<UserEntity> {
 
         User user = (User) authentication.getPrincipal();
 
-        return userRepository.findByUsername(user.getUsername());
+        return userRepository.auditLoadByUsername(user.getUsername());
     }
 }
