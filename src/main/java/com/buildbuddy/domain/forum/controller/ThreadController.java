@@ -29,4 +29,15 @@ public class ThreadController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> deleteThread(@RequestParam("threadId") Integer threadId,
+            HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<String> response = threadService.delete(threadId);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
 }

@@ -11,4 +11,6 @@ import java.util.Optional;
 public interface ThreadRepository extends JpaRepository<ThreadEntity, Integer> {
 
     Optional<ThreadEntity> findByIdAndUserId(Integer id, Integer userId);
+
+
 }

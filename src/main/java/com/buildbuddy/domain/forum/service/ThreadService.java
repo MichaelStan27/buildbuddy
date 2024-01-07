@@ -57,9 +57,29 @@ public class ThreadService {
 
         return DataResponse.<ThreadResponseDto>builder()
                 .timestamp(LocalDateTime.now())
-                .httpStatus(HttpStatus.CREATED)
+                .httpStatus(HttpStatus.OK)
                 .message("Success saving thread")
                 .data(data)
+                .build();
+    }
+
+    @Transactional
+    public DataResponse<String> delete(Integer threadId){
+        log.info("deleting thread with id: {}", threadId);
+        UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() ->  new BadRequestException("Request not authenticated"));
+        log.info("current authenticated user: {}", currentUser.getUsername());
+
+        ThreadEntity thread = threadRepository.findByIdAndUserId(threadId, currentUser.getId()).orElseThrow(() -> new BadRequestException("Post Not Found"));
+
+        log.info("deleting...");
+        threadRepository.delete(thread);
+        log.info("deleted.");
+
+        return DataResponse.<String>builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message("Success deleting thread")
+                .data("Thread with id: " + threadId + " deleted.")
                 .build();
     }
 
