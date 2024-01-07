@@ -3,8 +3,8 @@ package com.buildbuddy.domain.forum.service;
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.forum.dto.param.ThreadRequestParam;
 import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
-import com.buildbuddy.domain.forum.dto.response.ThreadResponseDto;
-import com.buildbuddy.domain.forum.dto.response.ThreadResponseSchema;
+import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseDto;
+import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseSchema;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
@@ -130,15 +130,10 @@ public class ThreadService {
         }
 
         log.info("saving...");
-        threadRepository.saveAndFlush(thread);
+        thread = threadRepository.saveAndFlush(thread);
         log.info("saved...");
 
-        ThreadResponseDto data = ThreadResponseDto.builder()
-                .post(thread.getPost())
-                .username(thread.getUser().getUsername())
-                .createdTime(thread.getCreatedTime())
-                .lastUpdateTime(thread.getLastUpdateTime())
-                .build();
+        ThreadResponseDto data = ThreadResponseDto.convertToDto(thread);
 
         return DataResponse.<ThreadResponseDto>builder()
                 .timestamp(LocalDateTime.now())

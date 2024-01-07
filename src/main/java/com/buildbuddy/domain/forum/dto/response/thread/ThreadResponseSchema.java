@@ -1,4 +1,4 @@
-package com.buildbuddy.domain.forum.dto.response;
+package com.buildbuddy.domain.forum.dto.response.thread;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;

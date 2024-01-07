@@ -18,7 +18,6 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
 public class UserEntity {
 
     @Id
@@ -44,7 +43,6 @@ public class UserEntity {
     @Column(name = "gender")
     private String gender;
 
-    @CreatedDate
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 

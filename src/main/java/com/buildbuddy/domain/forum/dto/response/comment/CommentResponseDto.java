@@ -1,6 +1,6 @@
-package com.buildbuddy.domain.forum.dto.response;
+package com.buildbuddy.domain.forum.dto.response.comment;
 
-import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.buildbuddy.domain.forum.entity.CommentEntity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -14,28 +14,33 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThreadResponseDto {
-
-    @JsonProperty(value = "post")
-    private String post;
+public class CommentResponseDto {
 
     @JsonProperty(value = "username")
     private String username;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonProperty(value = "message")
+    private String message;
+
+    @JsonProperty(value = "threadId")
+    private Integer threadId;
+
     @JsonProperty(value = "createdTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty(value = "lastUpdateTime")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
 
-    public static ThreadResponseDto convertToDto(ThreadEntity entity){
-        return ThreadResponseDto.builder()
-                .post(entity.getPost())
+    public static CommentResponseDto convertToDto(CommentEntity entity){
+        return CommentResponseDto.builder()
                 .username(entity.getUser().getUsername())
+                .message(entity.getMessage())
+                .threadId(entity.getThread().getId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();
     }
+
 }

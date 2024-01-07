@@ -62,6 +62,7 @@ public class UserService {
                 .role("user")
                 .age(userDto.getAge())
                 .gender(userDto.getGender())
+                .createdTime(LocalDateTime.now())
                 .build();
 
         user = userRepository.saveAndFlush(user);
