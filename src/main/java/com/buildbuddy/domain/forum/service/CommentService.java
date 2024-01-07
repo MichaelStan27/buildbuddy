@@ -62,4 +62,24 @@ public class CommentService {
                 .build();
     }
 
+    @Transactional
+    public DataResponse<String> delete(Integer threadId, Integer commentId){
+        log.info("Deleting comment by: comment id: {}, thread id: {}", commentId, threadId);
+
+        UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() -> new BadRequestException("Request not authenticated"));
+
+        CommentEntity comment = commentRepository.findByIdAndUserIdAndThreadId(commentId, currentUser.getId(), threadId).orElseThrow(() -> new BadRequestException("Comment Not Found"));
+
+        log.info("Deleting...");
+        commentRepository.delete(comment);
+        log.info("Deleted.");
+
+        return DataResponse.<String>builder()
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .message("Success Deleting Comment")
+                .data("Comment with id: " + commentId + " at thread id: " + threadId + " deleted.")
+                .build();
+    }
+
 }
