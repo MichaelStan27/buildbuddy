@@ -11,6 +11,7 @@ import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.spesification.ParamFilter;
+import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.persistence.criteria.Join;
 import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -33,6 +35,9 @@ public class ThreadService {
 
     @Autowired
     private AuditorAwareImpl audit;
+
+    @Autowired
+    private SpecificationCreator<ThreadEntity> specificationCreator;
 
     @Autowired
     private ThreadRepository threadRepository;
@@ -81,34 +86,9 @@ public class ThreadService {
         if(paramFilters.isEmpty())
             data = threadRepository.findAll(pageable);
         else
-            data = threadRepository.findAll(getSpecification(paramFilters), pageable);
+            data = threadRepository.findAll(specificationCreator.getSpecification(paramFilters), pageable);
 
         return data;
-    }
-
-    private Specification<ThreadEntity> getSpecification(List<ParamFilter> filters){
-        log.info("creating query by: {}", filters);
-
-        Specification<ThreadEntity> specification = Specification.where(createSpecification(filters.remove(0)));
-
-        for (ParamFilter filter: filters){
-            specification = specification.and(createSpecification(filter));
-        }
-
-        return specification;
-    }
-
-    private Specification<ThreadEntity> createSpecification(ParamFilter filter){
-        return switch (filter.getOperator()) {
-            case IN -> (root, query, cb) -> cb.in(root.get(filter.getField())).value(filter.getValues());
-            case EQUAL -> (root, query, cb) -> cb.equal(root.get(filter.getField()), filter.getValue());
-            case LIKE -> (root, query, cb) -> cb.like(root.get(filter.getField()), "%" + filter.getValue() + "%");
-            case THREAD -> (root, query, cb) -> {
-                Join<ThreadEntity, UserEntity> join = root.join("user", JoinType.INNER);
-                return cb.in(join.get(filter.getField())).value(filter.getValues());
-            };
-            default -> throw new BadRequestException("Operation for: " + filter.getOperator() + " is not supported");
-        };
     }
 
     @Transactional

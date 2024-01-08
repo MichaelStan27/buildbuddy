@@ -1,7 +1,9 @@
 package com.buildbuddy.domain.forum.controller;
 
+import com.buildbuddy.domain.forum.dto.param.CommentRequestParam;
 import com.buildbuddy.domain.forum.dto.request.CommentRequestDto;
 import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseDto;
+import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseSchema;
 import com.buildbuddy.domain.forum.service.CommentService;
 import com.buildbuddy.jsonresponse.DataResponse;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +19,17 @@ public class CommentController {
 
     @Autowired
     private CommentService commentService;
+
+    @GetMapping("/get")
+    public ResponseEntity<Object> getComment(CommentRequestParam requestParam,
+            HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<CommentResponseSchema> response = commentService.get(requestParam);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
 
     @PostMapping("/save")
     public ResponseEntity<Object> saveComment(@RequestBody CommentRequestDto body,

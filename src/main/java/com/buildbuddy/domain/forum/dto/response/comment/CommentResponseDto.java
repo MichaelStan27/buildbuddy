@@ -16,6 +16,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
 
+    @JsonProperty(value = "commentId")
+    private Integer commentId;
+
     @JsonProperty(value = "username")
     private String username;
 
@@ -35,6 +38,7 @@ public class CommentResponseDto {
 
     public static CommentResponseDto convertToDto(CommentEntity entity){
         return CommentResponseDto.builder()
+                .commentId(entity.getId())
                 .username(entity.getUser().getUsername())
                 .message(entity.getMessage())
                 .threadId(entity.getThread().getId())

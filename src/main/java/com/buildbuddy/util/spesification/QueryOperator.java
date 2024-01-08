@@ -4,5 +4,6 @@ public enum QueryOperator {
     EQUAL,
     IN,
     LIKE,
-    THREAD
+    USERNAME,
+    THREAD_ID
 }

@@ -2,6 +2,7 @@ package com.buildbuddy.domain.forum.dto.param;
 
 import com.buildbuddy.util.spesification.ParamFilter;
 import com.buildbuddy.util.spesification.QueryOperator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,11 +15,19 @@ import java.util.List;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ThreadRequestParam {
+public class CommentRequestParam {
 
+    @JsonProperty(value = "commentIdList")
+    private List<Integer> commentIdList;
+
+    @JsonProperty(value = "threadIdList")
     private List<Integer> threadIdList;
+
+    @JsonProperty(value = "usernameList")
     private List<String> usernameList;
-    private String post;
+
+    @JsonProperty(value = "message")
+    private String message;
 
     // Pagination
     @Builder.Default
@@ -40,30 +49,39 @@ public class ThreadRequestParam {
 
         List<ParamFilter> paramFilters = new ArrayList<>();
 
-        if(threadIdList != null && !threadIdList.isEmpty()){
+        if(commentIdList != null && !commentIdList.isEmpty()){
             paramFilters.add(ParamFilter.builder()
                             .field("id")
                             .operator(QueryOperator.IN)
+                            .values(commentIdList)
+                    .build());
+        }
+
+        if(threadIdList != null && !threadIdList.isEmpty()){
+            paramFilters.add(ParamFilter.builder()
+                            .field("id")
+                            .operator(QueryOperator.THREAD_ID)
                             .values(threadIdList)
                     .build());
         }
 
         if(usernameList != null && !usernameList.isEmpty()){
             paramFilters.add(ParamFilter.builder()
-                            .field("username")
-                            .operator(QueryOperator.USERNAME)
-                            .values(usernameList)
+                    .field("username")
+                    .operator(QueryOperator.USERNAME)
+                    .values(usernameList)
                     .build());
         }
 
-        if(post != null){
+        if(message != null){
             paramFilters.add(ParamFilter.builder()
-                            .field("post")
-                            .operator(QueryOperator.LIKE)
-                            .value(post)
+                    .field("message")
+                    .operator(QueryOperator.LIKE)
+                    .value(message)
                     .build());
         }
 
         return paramFilters;
     }
+
 }
