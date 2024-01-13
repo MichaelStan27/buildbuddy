@@ -38,7 +38,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("allowed path: {}", allowedPathList);
         http
-                .cors(httpSecurityCorsConfigurer -> corsConfigurationSource())
+                .cors(c -> c.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(allowedPathList.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
@@ -72,6 +72,8 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(corsUrl);
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
+        configuration.setExposedHeaders(List.of("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
