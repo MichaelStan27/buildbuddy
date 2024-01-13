@@ -31,9 +31,6 @@ public class SecurityConfig {
     @Value("#{'${spring.security.allowed.path}'.split(',')}")
     private List<String> allowedPathList;
 
-    @Value("#{'${spring.security.cors.url}'.split(',')}")
-    private List<String> corsUrl;
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         log.info("allowed path: {}", allowedPathList);
@@ -66,14 +63,11 @@ public class SecurityConfig {
 
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        log.info("Allowed CORS: {}", corsUrl);
-
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(corsUrl);
+        configuration.setAllowedOrigins(List.of("*"));
         configuration.setAllowedMethods(List.of("*"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setExposedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
