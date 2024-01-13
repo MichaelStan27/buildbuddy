@@ -1,6 +1,8 @@
 package com.buildbuddy.security;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +30,9 @@ import java.util.List;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
+    @Autowired
+    private CustomAuthenticationEntrypoint customAuthenticationEntrypoint;
+
     @Value("#{'${spring.security.allowed.path}'.split(',')}")
     private List<String> allowedPathList;
 
@@ -40,6 +45,7 @@ public class SecurityConfig {
                         .requestMatchers(allowedPathList.toArray(new String[0])).permitAll()
                         .anyRequest().authenticated()
                 )
+                .exceptionHandling(c -> c.authenticationEntryPoint(customAuthenticationEntrypoint))
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin((form) -> form
                         .loginPage("/login")
