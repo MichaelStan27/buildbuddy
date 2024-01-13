@@ -47,6 +47,7 @@ public class SecurityConfig {
                 )
                 .exceptionHandling(c -> c.authenticationEntryPoint(customAuthenticationEntrypoint))
                 .csrf(AbstractHttpConfigurer::disable)
+                .httpBasic(c -> c.authenticationEntryPoint(customAuthenticationEntrypoint))
                 .formLogin((form) -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
