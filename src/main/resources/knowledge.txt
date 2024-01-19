@@ -1,12 +1,13 @@
-Build Buddy adalah aplikasi berbasis web yang berguna untuk membantu user merakit pc impiannya secara mudah dan menyenangkan
-Build Buddy memiliki 5 fitur utama:
-1. System Builder - berguna untuk membantu user merakit komponent pc yang sesuai
-2. Software Compatibility - berguna untuk melakukan cek kompabilitas antara game dan sebuah spek pc
-3. Expert Consultation - sebagai wadah user untuk melakukan konsultasi dengan expert mengenai rakit pc
-4. Forum and Articles - sebagai wadah para user untuk saling bertukar pikiran dan mendapatkan informasi seputar rakit pc
+Build Buddy is a web-based application designed to assist users in easily and enjoyably assembling their dream PCs. Build Buddy comprises five main features:
+System Builder - aids users in assembling PC components that are suitable for their needs.
+Software Compatibility - enables users to check the compatibility between games and a PC's specifications.
+Expert Consultation - serves as a platform for users to consult with experts regarding PC assembly.
+Forum and Articles - provides users with a space to exchange ideas and gather information about PC assembly.
+Build Buddy was developed by a trio from PPTI 10:
+Michael Stanley, Fernando Clemente, Ethan Wang
+Under the guidance of Professor Diana from Bina Nusantara University.
 
-Build Buddy dibuat oleh 3 sekawan PPTI 10
-1. Michael Stanley
-2. Fernando Clemente
-3. Ethan Wang
-Yang dibimbing oleh dosen Bu Diana dari Universitas Bina Nusantara
+
+
+
+
