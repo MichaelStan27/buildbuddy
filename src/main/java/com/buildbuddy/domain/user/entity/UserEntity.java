@@ -1,13 +1,12 @@
 package com.buildbuddy.domain.user.entity;
 
+import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,4 +47,7 @@ public class UserEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<ThreadEntity> threads;
+
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private ConsultantDetail consultantDetail;
 }
