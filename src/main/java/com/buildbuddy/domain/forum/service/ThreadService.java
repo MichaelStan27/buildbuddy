@@ -10,6 +10,7 @@ import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
+import com.buildbuddy.util.PaginationCreator;
 import com.buildbuddy.util.spesification.ParamFilter;
 import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.persistence.criteria.Join;
@@ -42,6 +43,9 @@ public class ThreadService {
     @Autowired
     private ThreadRepository threadRepository;
 
+    @Autowired
+    private PaginationCreator paginationCreator;
+
     public DataResponse<ThreadResponseSchema> get(ThreadRequestParam requestParam){
 
         boolean isPaginated = requestParam.isPagination();
@@ -50,9 +54,9 @@ public class ThreadService {
         String sortBy = requestParam.getSortBy();
         String sortDirection = requestParam.getSortDirection();
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
 
-        Pageable pageable = (isPaginated) ? PageRequest.of(pageNo, pageSize, sort) : PageRequest.of(0, Integer.MAX_VALUE, sort);
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
         Page<ThreadEntity> dataPage = getThreadFromDB(requestParam, pageable);
         List<ThreadEntity> threadList = dataPage.getContent();
