@@ -1,5 +1,6 @@
 package com.buildbuddy.domain.consult.dto.response;
 
+import com.buildbuddy.domain.consult.entity.ConsultantModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -34,5 +35,17 @@ public class ConsultantDetailDto {
 
     @JsonProperty(value = "isAvailable")
     private Boolean isAvailable;
+
+    public static ConsultantDetailDto convertToDto(ConsultantModel m){
+        return ConsultantDetailDto.builder()
+                .username(m.getUsername())
+                .gender(m.getGender())
+                .email(m.getEmail())
+                .age(m.getAge())
+                .description(m.getDescription())
+                .fee(m.getFee())
+                .isAvailable(m.getAvailable() != 0)
+                .build();
+    }
 
 }
