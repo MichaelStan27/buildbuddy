@@ -13,6 +13,7 @@ import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
+import com.buildbuddy.util.PaginationCreator;
 import com.buildbuddy.util.spesification.ParamFilter;
 import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.transaction.Transactional;
@@ -46,6 +47,9 @@ public class CommentService {
     @Autowired
     private CommentRepository commentRepository;
 
+    @Autowired
+    private PaginationCreator paginationCreator;
+
     public DataResponse<CommentResponseSchema> get(CommentRequestParam requestParam){
         log.info("param: {}", requestParam);
 
@@ -55,9 +59,9 @@ public class CommentService {
         String sortBy = requestParam.getSortBy();
         String sortDirection = requestParam.getSortDirection();
 
-        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), sortBy);
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
 
-        Pageable pageable = (isPaginated) ? PageRequest.of(pageNo, pageSize, sort) : PageRequest.of(0, Integer.MAX_VALUE, sort);
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
         Page<CommentEntity> dataPage = getCommentFromDB(requestParam, pageable);
         List<CommentEntity> commentList = dataPage.getContent();
