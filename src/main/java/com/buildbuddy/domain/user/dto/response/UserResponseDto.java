@@ -25,12 +25,16 @@ public class UserResponseDto {
     @JsonProperty(value = "gender")
     private String gender;
 
+    @JsonProperty(value = "balance")
+    private Double balance;
+
     public static UserResponseDto convertToDto(UserEntity entity){
         return UserResponseDto.builder()
                 .username(entity.getUsername())
                 .email(entity.getEmail())
                 .age(entity.getAge())
                 .gender(entity.getGender())
+                .balance(entity.getBalance())
                 .build();
     }
 
