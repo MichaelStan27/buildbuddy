@@ -62,6 +62,7 @@ public class UserService {
                 .role("user")
                 .age(userDto.getAge())
                 .gender(userDto.getGender())
+                .balance((double) 0)
                 .createdTime(LocalDateTime.now())
                 .build();
 

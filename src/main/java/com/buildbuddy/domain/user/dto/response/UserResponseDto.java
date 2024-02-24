@@ -28,6 +28,9 @@ public class UserResponseDto {
     @JsonProperty(value = "role")
     private String role;
 
+    @JsonProperty(value = "balance")
+    private Double balance;
+
     public static UserResponseDto convertToDto(UserEntity entity){
         return UserResponseDto.builder()
                 .username(entity.getUsername())
@@ -35,6 +38,7 @@ public class UserResponseDto {
                 .age(entity.getAge())
                 .gender(entity.getGender())
                 .role(entity.getRole())
+                .balance(entity.getBalance())
                 .build();
     }
 

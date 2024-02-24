@@ -42,6 +42,9 @@ public class UserEntity {
     @Column(name = "gender")
     private String gender;
 
+    @Column(name = "balance")
+    private Double balance;
+
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 
