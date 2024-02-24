@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,7 +31,7 @@ public class UserResponseDto {
     private String role;
 
     @JsonProperty(value = "balance")
-    private Double balance;
+    private BigDecimal balance;
 
     public static UserResponseDto convertToDto(UserEntity entity){
         return UserResponseDto.builder()

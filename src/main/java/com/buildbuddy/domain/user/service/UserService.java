@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -62,7 +63,7 @@ public class UserService {
                 .role("user")
                 .age(userDto.getAge())
                 .gender(userDto.getGender())
-                .balance((double) 0)
+                .balance(BigDecimal.ZERO)
                 .createdTime(LocalDateTime.now())
                 .build();
 
