@@ -10,6 +10,18 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<UserEntity, Integer> {
 
+    @Query(nativeQuery = true, value = "SELECT * FROM user where user_id = :userId " +
+            "AND user_id not in ( " +
+            "select DISTINCT (user_id) from consultant_detail " +
+            ")")
+    Optional<UserEntity> findUserById(@Param("userId") Integer userId);
+
+    @Query(nativeQuery = true, value = "SELECT * FROM user where user_id = :consultantId " +
+            "AND user_id in ( " +
+                "select DISTINCT (user_id) from consultant_detail " +
+            ")")
+    Optional<UserEntity> findByConsultantId(@Param("consultantId") Integer consultantId);
+
     Optional<UserEntity> findByUsername(String username);
 
     // Only for audit purpose, dont user for other purpose
