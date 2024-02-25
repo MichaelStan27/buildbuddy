@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.consult.controller;
 
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
+import com.buildbuddy.domain.consult.dto.param.RoomChatReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
 import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.ConsultantDetailDto;
@@ -40,6 +41,16 @@ public class ConsultController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
         DataResponse<ConsultantSchema> response = consultService.get(param);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @GetMapping("/get-room-chat")
+    public ResponseEntity<Object> transaction(RoomChatReqParam param, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = consultService.getRoomChat(param);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());

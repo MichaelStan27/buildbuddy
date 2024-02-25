@@ -2,11 +2,10 @@ package com.buildbuddy.domain.consult.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
+import com.buildbuddy.domain.consult.dto.param.RoomChatReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
 import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
-import com.buildbuddy.domain.consult.dto.response.ConsultantDetailDto;
-import com.buildbuddy.domain.consult.dto.response.ConsultantSchema;
-import com.buildbuddy.domain.consult.dto.response.TransactionDto;
+import com.buildbuddy.domain.consult.dto.response.*;
 import com.buildbuddy.domain.consult.entity.ConsultTransaction;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.consult.entity.ConsultantModel;
@@ -14,6 +13,7 @@ import com.buildbuddy.domain.consult.entity.RoomMaster;
 import com.buildbuddy.domain.consult.repository.ConsultTransactionRepository;
 import com.buildbuddy.domain.consult.repository.ConsultantDetailRepository;
 import com.buildbuddy.domain.consult.repository.RoomMasterRepository;
+import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.UserRepository;
 import com.buildbuddy.enums.TransactionStatus;
@@ -22,6 +22,8 @@ import com.buildbuddy.enums.UserRole;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
+import com.buildbuddy.util.spesification.ParamFilter;
+import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,6 +60,9 @@ public class ConsultService {
 
     @Autowired
     private PaginationCreator paginationCreator;
+
+    @Autowired
+    private SpecificationCreator<RoomMaster> roomMasterSpecCreator;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyHHmmss");
 
@@ -153,6 +159,55 @@ public class ConsultService {
 
     private String createLikeKeyword(String word){
         return word != null ? "%" + word.toUpperCase() + "%" : null;
+    }
+
+    public DataResponse<Object> getRoomChat(RoomChatReqParam param){
+        log.info("Getting room chat list by: {}", param);
+
+        boolean isPaginated = param.isPagination();
+        Integer pageNo = param.getPageNo();
+        Integer pageSize = param.getPageSize();
+        String sortBy = param.getSortBy();
+        String sortDirection = param.getSortDirection();
+
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+
+        Page<RoomMaster> roomMasterPage = getRoomMasterFromDB(param, pageable);
+
+        List<RoomMasterDto> dtoList = roomMasterPage.getContent().stream()
+                .map(RoomMasterDto::convertToDto)
+                .toList();
+
+        RoomMasterSchema data = RoomMasterSchema.builder()
+                .roomChatList(dtoList)
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(roomMasterPage.getTotalPages())
+                .totalData(roomMasterPage.getTotalElements())
+                .build();
+
+        return DataResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .message("success getting room chat list")
+                .data(data)
+                .build();
+    }
+
+    private Page<RoomMaster> getRoomMasterFromDB(RoomChatReqParam param, Pageable pageable){
+        log.info("Getting room master from DB...");
+
+        List<ParamFilter> paramFilters = param.getFilter();
+        Page<RoomMaster> data = null;
+
+        if(paramFilters.isEmpty())
+            data = roomMasterRepository.findAll(pageable);
+        else
+            data = roomMasterRepository.findAll(roomMasterSpecCreator.getSpecification(paramFilters), pageable);
+
+        return data;
     }
 
     public DataResponse<Object> transaction(TransactionReqDto dto){
