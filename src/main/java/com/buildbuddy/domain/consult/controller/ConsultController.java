@@ -2,6 +2,7 @@ package com.buildbuddy.domain.consult.controller;
 
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
+import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.ConsultantDetailDto;
 import com.buildbuddy.domain.consult.dto.response.ConsultantSchema;
 import com.buildbuddy.domain.consult.service.ConsultService;
@@ -39,6 +40,16 @@ public class ConsultController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
         DataResponse<ConsultantSchema> response = consultService.get(param);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @PostMapping("/transaction")
+    public ResponseEntity<Object> transaction(@RequestBody TransactionReqDto body, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = consultService.transaction(body);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());

@@ -3,13 +3,21 @@ package com.buildbuddy.domain.consult.service;
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
+import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.ConsultantDetailDto;
 import com.buildbuddy.domain.consult.dto.response.ConsultantSchema;
+import com.buildbuddy.domain.consult.dto.response.TransactionDto;
+import com.buildbuddy.domain.consult.entity.ConsultTransaction;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.consult.entity.ConsultantModel;
+import com.buildbuddy.domain.consult.entity.RoomMaster;
+import com.buildbuddy.domain.consult.repository.ConsultTransactionRepository;
 import com.buildbuddy.domain.consult.repository.ConsultantDetailRepository;
+import com.buildbuddy.domain.consult.repository.RoomMasterRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.UserRepository;
+import com.buildbuddy.enums.TransactionStatus;
+import com.buildbuddy.enums.TransactionWorkflow;
 import com.buildbuddy.enums.UserRole;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
@@ -25,8 +33,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,7 +50,15 @@ public class ConsultService {
     private ConsultantDetailRepository consultantDetailRepository;
 
     @Autowired
+    private ConsultTransactionRepository consultTransactionRepository;
+
+    @Autowired
+    private RoomMasterRepository roomMasterRepository;
+
+    @Autowired
     private PaginationCreator paginationCreator;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyHHmmss");
 
     @Transactional
     public DataResponse<ConsultantDetailDto> save(ConsultantReqDto consultantReqDto){
@@ -137,5 +153,102 @@ public class ConsultService {
 
     private String createLikeKeyword(String word){
         return word != null ? "%" + word.toUpperCase() + "%" : null;
+    }
+
+    public DataResponse<Object> transaction(TransactionReqDto dto){
+        log.info("Start saving transaction detail");
+
+        ConsultTransaction consultTransaction = null;
+        TransactionStatus status = null;
+        UserEntity user = null;
+        UserEntity consultant = null;
+
+        if(dto.getTransactionId() == null){
+            user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new RuntimeException("user not found"));
+
+            consultant = userRepository.findByConsultantId(dto.getConsultantId()).orElseThrow(() -> new RuntimeException("consultant not found"));
+
+            status = TransactionStatus.PENDING;
+
+            consultTransaction = ConsultTransaction.builder()
+                    .user(user)
+                    .consultant(consultant)
+                    .status(TransactionStatus.PENDING.getValue())
+                    .build();
+        }
+        else{
+            status = TransactionStatus.stream()
+                    .filter(s -> s.getValue().equals(dto.getStatus()))
+                    .findAny()
+                    .orElseThrow(() -> new RuntimeException("Status not found"));
+
+            consultTransaction = consultTransactionRepository.findByTransactionIdAndUserIdAndConsultantId(dto.getTransactionId(), dto.getUserId(), dto.getConsultantId())
+                    .orElseThrow(() -> new RuntimeException("consult transaction not found"));
+
+            TransactionStatus oldStatus = TransactionStatus.getByValue(consultTransaction.getStatus());
+            TransactionWorkflow wf = TransactionWorkflow.getByTransactionStatus(oldStatus);
+            List<TransactionStatus> allowedNextStatus = wf.getNextStatus();
+
+            if(!allowedNextStatus.contains(status))
+                throw new RuntimeException("Cant change transaction status from " + oldStatus + " to " + status);
+
+            consultTransaction.setStatus(status.getValue());
+
+            user = consultTransaction.getUser();
+            consultant = consultTransaction.getConsultant();
+        }
+
+        String roomId = null;
+
+        switch (status){
+            case PENDING -> {
+                BigDecimal userBalance = user.getBalance();
+                BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
+                if(userBalance.compareTo(consultantFee) < 0) throw new RuntimeException("Insufficient user balance");
+                user.setBalance(userBalance.subtract(consultantFee));
+                log.info("User Balance Deducted by: {}", consultantFee);
+            }
+            case ON_PROGRESS -> {
+                String time = LocalDateTime.now().format(formatter);
+                roomId = user.getId() + consultant.getId() + time;
+
+                RoomMaster roomMaster = RoomMaster.builder()
+                        .roomId(roomId)
+                        .user(user)
+                        .consultant(consultant)
+                        .build();
+
+                roomMasterRepository.saveAndFlush(roomMaster);
+                consultTransaction.setRoomMaster(roomMaster);
+            }
+            case REJECTED -> {
+                BigDecimal userBalance = user.getBalance();
+                BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
+                user.setBalance(userBalance.add(consultantFee));
+                log.info("User Balance added by: {}", consultantFee);
+            }
+            case COMPLETED -> {
+                BigDecimal consultantBalance = consultant.getBalance();
+                BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
+                consultant.setBalance(consultantBalance.add(consultantFee));
+                log.info("Consultant Balance added by: {}", consultantFee);
+            }
+        }
+
+        consultTransaction = consultTransactionRepository.saveAndFlush(consultTransaction);
+        userRepository.saveAllAndFlush(List.of(user, consultant));
+
+        TransactionDto data = TransactionDto.builder()
+                .transactionId(consultTransaction.getTransactionId())
+                .status(consultTransaction.getStatus())
+                .roomId(roomId)
+                .build();
+
+        return DataResponse.<Object>builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message("Success saving transaction detail")
+                .data(data)
+                .build();
     }
 }
