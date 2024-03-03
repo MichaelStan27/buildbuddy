@@ -1,5 +1,6 @@
 package com.buildbuddy.domain.user.controller;
 
+import com.buildbuddy.domain.user.dto.request.BalanceReqDto;
 import com.buildbuddy.domain.user.dto.request.UserRequestDto;
 import com.buildbuddy.domain.user.dto.response.UserResponseDto;
 import com.buildbuddy.domain.user.service.UserService;
@@ -39,6 +40,16 @@ public class UserController {
         log.info("param: {}", userDto.getUsername());
 
         DataResponse<UserResponseDto> response = userService.createUser(userDto);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @PostMapping("/topup")
+    public ResponseEntity<Object> topup(@RequestBody BalanceReqDto body, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = userService.topup(body);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());

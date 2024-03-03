@@ -12,4 +12,12 @@ public enum BalanceTransactionType {
 
     private String value;
 
+    public static BalanceTransactionType getByValue(String value){
+        for (BalanceTransactionType type : values()){
+            if(type.getValue().equals(value))
+                return type;
+        }
+        throw new RuntimeException("Balance Transaction Type not found for value: " + value);
+    }
+
 }
