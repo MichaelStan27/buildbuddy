@@ -13,11 +13,14 @@ import com.buildbuddy.domain.consult.entity.RoomMaster;
 import com.buildbuddy.domain.consult.repository.ConsultTransactionRepository;
 import com.buildbuddy.domain.consult.repository.ConsultantDetailRepository;
 import com.buildbuddy.domain.consult.repository.RoomMasterRepository;
-import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.buildbuddy.domain.user.entity.BalanceTransaction;
 import com.buildbuddy.domain.user.entity.UserEntity;
+import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
-import com.buildbuddy.enums.TransactionStatus;
-import com.buildbuddy.enums.TransactionWorkflow;
+import com.buildbuddy.enums.balance.BalanceTransactionStatus;
+import com.buildbuddy.enums.balance.BalanceTransactionType;
+import com.buildbuddy.enums.consult.ConsultTransactionStatus;
+import com.buildbuddy.enums.consult.ConsultTransactionWorkflow;
 import com.buildbuddy.enums.UserRole;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
@@ -36,8 +39,8 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -57,6 +60,9 @@ public class ConsultService {
 
     @Autowired
     private RoomMasterRepository roomMasterRepository;
+
+    @Autowired
+    private BalanceTransactionRepository balanceTransactionRepository;
 
     @Autowired
     private PaginationCreator paginationCreator;
@@ -210,11 +216,12 @@ public class ConsultService {
         return data;
     }
 
+    @Transactional
     public DataResponse<Object> transaction(TransactionReqDto dto){
         log.info("Start saving transaction detail");
 
         ConsultTransaction consultTransaction = null;
-        TransactionStatus status = null;
+        ConsultTransactionStatus status = null;
         UserEntity user = null;
         UserEntity consultant = null;
 
@@ -223,16 +230,16 @@ public class ConsultService {
 
             consultant = userRepository.findByConsultantId(dto.getConsultantId()).orElseThrow(() -> new RuntimeException("consultant not found"));
 
-            status = TransactionStatus.PENDING;
+            status = ConsultTransactionStatus.PENDING;
 
             consultTransaction = ConsultTransaction.builder()
                     .user(user)
                     .consultant(consultant)
-                    .status(TransactionStatus.PENDING.getValue())
+                    .status(ConsultTransactionStatus.PENDING.getValue())
                     .build();
         }
         else{
-            status = TransactionStatus.stream()
+            status = ConsultTransactionStatus.stream()
                     .filter(s -> s.getValue().equals(dto.getStatus()))
                     .findAny()
                     .orElseThrow(() -> new RuntimeException("Status not found"));
@@ -240,9 +247,9 @@ public class ConsultService {
             consultTransaction = consultTransactionRepository.findByTransactionIdAndUserIdAndConsultantId(dto.getTransactionId(), dto.getUserId(), dto.getConsultantId())
                     .orElseThrow(() -> new RuntimeException("consult transaction not found"));
 
-            TransactionStatus oldStatus = TransactionStatus.getByValue(consultTransaction.getStatus());
-            TransactionWorkflow wf = TransactionWorkflow.getByTransactionStatus(oldStatus);
-            List<TransactionStatus> allowedNextStatus = wf.getNextStatus();
+            ConsultTransactionStatus oldStatus = ConsultTransactionStatus.getByValue(consultTransaction.getStatus());
+            ConsultTransactionWorkflow wf = ConsultTransactionWorkflow.getByTransactionStatus(oldStatus);
+            List<ConsultTransactionStatus> allowedNextStatus = wf.getNextStatus();
 
             if(!allowedNextStatus.contains(status))
                 throw new RuntimeException("Cant change transaction status from " + oldStatus + " to " + status);
@@ -254,6 +261,7 @@ public class ConsultService {
         }
 
         String roomId = null;
+        List<BalanceTransaction> balanceTransactionList = new ArrayList<>();
 
         switch (status){
             case PENDING -> {
@@ -262,6 +270,9 @@ public class ConsultService {
                 if(userBalance.compareTo(consultantFee) < 0) throw new RuntimeException("Insufficient user balance");
                 user.setBalance(userBalance.subtract(consultantFee));
                 log.info("User Balance Deducted by: {}", consultantFee);
+
+                BalanceTransaction userTrans = createBalanceTrans(user, consultTransaction, consultantFee, BalanceTransactionStatus.ON_HOLD, BalanceTransactionType.CONSULT);
+                balanceTransactionList.add(userTrans);
             }
             case ON_PROGRESS -> {
                 String time = LocalDateTime.now().format(formatter);
@@ -281,17 +292,27 @@ public class ConsultService {
                 BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
                 user.setBalance(userBalance.add(consultantFee));
                 log.info("User Balance added by: {}", consultantFee);
+
+                BalanceTransaction userTrans = user.getBalanceByConsultTransactionId(consultTransaction);
+                userTrans.setStatus(BalanceTransactionStatus.RETURNED.getValue());
+                balanceTransactionList.add(userTrans);
             }
             case COMPLETED -> {
                 BigDecimal consultantBalance = consultant.getBalance();
                 BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
                 consultant.setBalance(consultantBalance.add(consultantFee));
                 log.info("Consultant Balance added by: {}", consultantFee);
+
+                BalanceTransaction userTrans = user.getBalanceByConsultTransactionId(consultTransaction);
+                userTrans.setStatus(BalanceTransactionStatus.DEDUCTED.getValue());
+                BalanceTransaction consultTrans = createBalanceTrans(consultant, consultTransaction, consultantFee, BalanceTransactionStatus.ADDED, BalanceTransactionType.CONSULT);
+                balanceTransactionList.addAll(List.of(userTrans, consultTrans));
             }
         }
 
         consultTransaction = consultTransactionRepository.saveAndFlush(consultTransaction);
         userRepository.saveAllAndFlush(List.of(user, consultant));
+        balanceTransactionRepository.saveAllAndFlush(balanceTransactionList);
 
         TransactionDto data = TransactionDto.builder()
                 .transactionId(consultTransaction.getTransactionId())
@@ -304,6 +325,16 @@ public class ConsultService {
                 .httpStatus(HttpStatus.OK)
                 .message("Success saving transaction detail")
                 .data(data)
+                .build();
+    }
+
+    private BalanceTransaction createBalanceTrans(UserEntity user, ConsultTransaction consultTransaction, BigDecimal nominal, BalanceTransactionStatus status, BalanceTransactionType type){
+        return BalanceTransaction.builder()
+                .user(user)
+                .consultTransaction(consultTransaction)
+                .nominal(nominal)
+                .status(status.getValue())
+                .transactionType(type.getValue())
                 .build();
     }
 }

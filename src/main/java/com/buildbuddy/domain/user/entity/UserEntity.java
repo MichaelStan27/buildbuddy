@@ -1,5 +1,6 @@
 package com.buildbuddy.domain.user.entity;
 
+import com.buildbuddy.domain.consult.entity.ConsultTransaction;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import jakarta.persistence.*;
@@ -54,4 +55,14 @@ public class UserEntity {
 
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private ConsultantDetail consultantDetail;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private List<BalanceTransaction> balanceTransactionList;
+
+    public BalanceTransaction getBalanceByConsultTransactionId(ConsultTransaction consultTransaction){
+        return this.balanceTransactionList.stream()
+                .filter(b -> b.getConsultTransaction().getTransactionId().equals(consultTransaction.getTransactionId()))
+                .findAny()
+                .orElseThrow(() -> new RuntimeException("Cant find balance transaction by consult transaction "));
+    }
 }

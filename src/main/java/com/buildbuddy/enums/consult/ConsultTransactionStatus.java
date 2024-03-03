@@ -1,4 +1,4 @@
-package com.buildbuddy.enums;
+package com.buildbuddy.enums.consult;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import java.util.stream.Stream;
 
 @Getter
 @AllArgsConstructor
-public enum TransactionStatus {
+public enum ConsultTransactionStatus {
     PENDING("PENDING"),
     ON_PROGRESS("ON_PROGRESS"),
     REJECTED("REJECTED"),
@@ -16,15 +16,15 @@ public enum TransactionStatus {
 
     private String value;
 
-    public static TransactionStatus getByValue(String value){
-        for (TransactionStatus status : values()){
+    public static ConsultTransactionStatus getByValue(String value){
+        for (ConsultTransactionStatus status : values()){
             if(status.getValue().equals(value))
                 return status;
         }
         throw new RuntimeException("Transaction Status not found for value: " + value);
     }
 
-    public static Stream<TransactionStatus> stream(){
+    public static Stream<ConsultTransactionStatus> stream(){
         return Arrays.stream(values());
     }
 }
