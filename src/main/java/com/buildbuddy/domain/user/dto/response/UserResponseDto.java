@@ -27,6 +27,9 @@ public class UserResponseDto {
     @JsonProperty(value = "gender")
     private String gender;
 
+    @JsonProperty(value = "role")
+    private String role;
+
     @JsonProperty(value = "balance")
     private BigDecimal balance;
 
@@ -36,6 +39,7 @@ public class UserResponseDto {
                 .email(entity.getEmail())
                 .age(entity.getAge())
                 .gender(entity.getGender())
+                .role(entity.getRole())
                 .balance(entity.getBalance())
                 .build();
     }
