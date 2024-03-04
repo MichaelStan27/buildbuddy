@@ -1,15 +1,13 @@
 package com.buildbuddy.domain.consult.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.consult.dto.param.ConsultTransactionReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
 import com.buildbuddy.domain.consult.dto.param.RoomChatReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
 import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.*;
-import com.buildbuddy.domain.consult.entity.ConsultTransaction;
-import com.buildbuddy.domain.consult.entity.ConsultantDetail;
-import com.buildbuddy.domain.consult.entity.ConsultantModel;
-import com.buildbuddy.domain.consult.entity.RoomMaster;
+import com.buildbuddy.domain.consult.entity.*;
 import com.buildbuddy.domain.consult.repository.ConsultTransactionRepository;
 import com.buildbuddy.domain.consult.repository.ConsultantDetailRepository;
 import com.buildbuddy.domain.consult.repository.RoomMasterRepository;
@@ -41,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -159,6 +158,42 @@ public class ConsultService {
                 .timestamp(LocalDateTime.now())
                 .httpStatus(HttpStatus.OK)
                 .message("Success getting consultant list")
+                .data(data)
+                .build();
+    }
+
+    public DataResponse<Object> getTransaction(ConsultTransactionReqParam param){
+
+        log.info("Getting transaction by: {}", param);
+
+        boolean isPaginated = param.isPagination();
+        Integer pageNo = param.getPageNo();
+        Integer pageSize = param.getPageSize();
+        String sortBy = param.getSortBy();
+        String sortDirection = param.getSortDirection();
+
+        Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
+
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+
+        Page<ConsultTransactionModel> consultTransactionModels = consultTransactionRepository.getByCustomParam(param.getUserId(), pageable);
+
+        List<ConsultTransactionDto> consultTransactionDtos = consultTransactionModels.getContent().stream()
+                .map(ConsultTransactionDto::convertToDto)
+                .toList();
+
+        ConsultTransactionSchema data = ConsultTransactionSchema.builder()
+                .consultTransactionList(consultTransactionDtos)
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalData(consultTransactionModels.getTotalElements())
+                .totalPages(consultTransactionModels.getTotalPages())
+                .build();
+
+        return DataResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .message("Success Gettomg Consult Transaction")
                 .data(data)
                 .build();
     }
