@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public interface ConsultantModel {
 
+    Integer getConsultantId();
+
     String getUsername();
 
     String getEmail();

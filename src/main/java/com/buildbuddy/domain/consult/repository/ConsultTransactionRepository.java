@@ -23,4 +23,8 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
             "and ct.consultant_id = (case when :consultantId is null then ct.consultant_id else :consultantId end)")
     Page<ConsultTransactionModel> getByCustomParam(@Param("userId") Integer userId, @Param("consultantId") Integer consultantId,Pageable pageable);
 
+    @Query(nativeQuery = true, value = "select * from consult_transaction " +
+            "where user_id = :userId and consultant_id = :consultantId and status = 'PENDING' ")
+    Optional<ConsultTransaction> getPendingTransaction(@Param("userId") Integer userId, @Param("consultantId") Integer consultantId);
+
 }

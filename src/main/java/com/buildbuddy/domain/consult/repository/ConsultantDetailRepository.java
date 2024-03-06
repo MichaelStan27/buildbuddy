@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ConsultantDetailRepository extends JpaRepository<ConsultantDetail, Integer> {
 
-    @Query(nativeQuery = true, value = "SELECT u.username as username, u.email as email, u.age as age, u.gender as gender, " +
+    @Query(nativeQuery = true, value = "SELECT u.user_id as consultantId, u.username as username, u.email as email, u.age as age, u.gender as gender, " +
             "detail.description as description, detail.fee as fee, detail.available as available " +
             "FROM consultant_detail detail JOIN user u ON u.user_id = detail.user_id " +
             "WHERE UPPER(u.username) LIKE (case when :username is null then u.username else :username end) " +

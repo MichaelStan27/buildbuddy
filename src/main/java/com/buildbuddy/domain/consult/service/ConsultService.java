@@ -39,6 +39,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -264,6 +265,10 @@ public class ConsultService {
             user = userRepository.findUserById(dto.getUserId()).orElseThrow(() -> new RuntimeException("user not found"));
 
             consultant = userRepository.findByConsultantId(dto.getConsultantId()).orElseThrow(() -> new RuntimeException("consultant not found"));
+
+            Optional<ConsultTransaction> pendingTrans = consultTransactionRepository.getPendingTransaction(user.getId(), consultant.getId());
+
+            if(pendingTrans.isPresent()) throw new RuntimeException("there is still another pending transaction, please complete it first");
 
             status = ConsultTransactionStatus.PENDING;
 

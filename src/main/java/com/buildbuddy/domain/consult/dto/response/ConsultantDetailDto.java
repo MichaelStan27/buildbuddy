@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ConsultantDetailDto {
 
+    @JsonProperty(value = "consultantId")
+    private Integer consultantId;
+
     @JsonProperty(value = "username")
     private String username;
 
@@ -38,6 +41,7 @@ public class ConsultantDetailDto {
 
     public static ConsultantDetailDto convertToDto(ConsultantModel m){
         return ConsultantDetailDto.builder()
+                .consultantId(m.getConsultantId())
                 .username(m.getUsername())
                 .gender(m.getGender())
                 .email(m.getEmail())
