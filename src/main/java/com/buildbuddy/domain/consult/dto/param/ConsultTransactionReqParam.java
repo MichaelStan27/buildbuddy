@@ -13,6 +13,8 @@ public class ConsultTransactionReqParam {
 
     private Integer userId;
 
+    private Integer consultantId;
+
     // Pagination
     @Builder.Default
     private boolean pagination = false;

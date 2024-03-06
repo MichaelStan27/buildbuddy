@@ -15,6 +15,9 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class UserResponseDto {
 
+    @JsonProperty("userId")
+    private Integer userId;
+
     @JsonProperty(value = "username")
     private String username;
 
@@ -35,6 +38,7 @@ public class UserResponseDto {
 
     public static UserResponseDto convertToDto(UserEntity entity){
         return UserResponseDto.builder()
+                .userId(entity.getId())
                 .username(entity.getUsername())
                 .email(entity.getEmail())
                 .age(entity.getAge())

@@ -14,11 +14,13 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
 
     Optional<ConsultTransaction> findByTransactionIdAndUserIdAndConsultantId(Integer transactionId, Integer userId, Integer consultantId);
 
-    @Query(nativeQuery = true, value = "select ct.transaction_id as transactionId, u.username as consultantName, ct.room_id as roomId, ct.status as status, " +
+    @Query(nativeQuery = true, value = "select ct.transaction_id as transactionId, u2.username as username, u.username as consultantName, ct.room_id as roomId, ct.status as status, " +
             "ct.created_time as createdTime, ct.last_update_time as lastUpdateTime " +
             "from consult_transaction ct " +
             "join user u on ct.consultant_id = u.user_id " +
-            "where ct.user_id = :userId")
-    Page<ConsultTransactionModel> getByCustomParam(@Param("userId") Integer userId, Pageable pageable);
+            "join user u2 on ct.user_id = u2.user_id " +
+            "where ct.user_id = (case when :userId is null then ct.user_id else :userId end) " +
+            "and ct.consultant_id = (case when :consultantId is null then ct.consultant_id else :consultantId end)")
+    Page<ConsultTransactionModel> getByCustomParam(@Param("userId") Integer userId, @Param("consultantId") Integer consultantId,Pageable pageable);
 
 }

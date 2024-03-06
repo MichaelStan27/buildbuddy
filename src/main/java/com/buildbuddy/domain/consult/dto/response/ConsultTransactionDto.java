@@ -19,6 +19,9 @@ public class ConsultTransactionDto {
     @JsonProperty("transactionId")
     private Integer transactionId;
 
+    @JsonProperty("username")
+    private String username;
+
     @JsonProperty("consultantName")
     private String consultantName;
 
@@ -39,6 +42,7 @@ public class ConsultTransactionDto {
     public static ConsultTransactionDto convertToDto(ConsultTransactionModel m){
         return ConsultTransactionDto.builder()
                 .transactionId(m.getTransactionId())
+                .username(m.getUsername())
                 .consultantName(m.getConsultantName())
                 .roomId(m.getRoomId())
                 .status(m.getStatus())

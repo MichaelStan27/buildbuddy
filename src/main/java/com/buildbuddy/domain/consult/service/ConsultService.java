@@ -176,7 +176,7 @@ public class ConsultService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ConsultTransactionModel> consultTransactionModels = consultTransactionRepository.getByCustomParam(param.getUserId(), pageable);
+        Page<ConsultTransactionModel> consultTransactionModels = consultTransactionRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), pageable);
 
         List<ConsultTransactionDto> consultTransactionDtos = consultTransactionModels.getContent().stream()
                 .map(ConsultTransactionDto::convertToDto)
