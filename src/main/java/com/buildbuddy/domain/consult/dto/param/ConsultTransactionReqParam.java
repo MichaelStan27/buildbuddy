@@ -29,5 +29,5 @@ public class ConsultTransactionReqParam {
     private String sortBy = "lastUpdateTime";
 
     @Builder.Default
-    private String sortDirection = "asc";
+    private String sortDirection = "desc";
 }
