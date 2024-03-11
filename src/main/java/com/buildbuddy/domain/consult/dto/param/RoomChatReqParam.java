@@ -23,6 +23,9 @@ public class RoomChatReqParam {
     private List<Integer> consultantIdList;
 
     @Builder.Default
+    private boolean expired = false;
+
+    @Builder.Default
     private boolean pagination = false;
 
     @Builder.Default

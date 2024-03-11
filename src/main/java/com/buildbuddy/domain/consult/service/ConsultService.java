@@ -220,6 +220,7 @@ public class ConsultService {
 
         List<RoomMasterDto> dtoList = roomMasterPage.getContent().stream()
                 .map(RoomMasterDto::convertToDto)
+                .filter(r -> param.isExpired() == r.getIsExpired())
                 .toList();
 
         RoomMasterSchema data = RoomMasterSchema.builder()
