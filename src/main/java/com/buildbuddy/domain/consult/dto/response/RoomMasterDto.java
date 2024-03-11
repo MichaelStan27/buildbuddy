@@ -29,12 +29,22 @@ public class RoomMasterDto {
     @JsonFormat(pattern = "dd-MM-yyyy, HH:mm:ss")
     private LocalDateTime createdTime;
 
+    @JsonProperty
+    @JsonFormat(pattern = "dd-MM-yyyy, HH:mm:ss")
+    private LocalDateTime expiredTime;
+
+    @JsonProperty
+    private Boolean isExpired;
+
     public static RoomMasterDto convertToDto(RoomMaster e){
+        LocalDateTime expiredTime = e.getCreatedTime().plusHours(1);
         return RoomMasterDto.builder()
                 .roomId(e.getRoomId())
                 .user(e.getUser().getUsername())
                 .consultant(e.getConsultant().getUsername())
                 .createdTime(e.getCreatedTime())
+                .expiredTime(expiredTime)
+                .isExpired(!LocalDateTime.now().isBefore(expiredTime))
                 .build();
     }
 
