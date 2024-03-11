@@ -6,7 +6,11 @@ public interface ConsultTransactionModel {
 
     Integer getTransactionId();
 
+    Integer getUserId();
+
     String getUsername();
+
+    Integer getConsultantId();
 
     String getConsultantName();
 

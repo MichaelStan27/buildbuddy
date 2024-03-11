@@ -14,7 +14,8 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
 
     Optional<ConsultTransaction> findByTransactionIdAndUserIdAndConsultantId(Integer transactionId, Integer userId, Integer consultantId);
 
-    @Query(nativeQuery = true, value = "select ct.transaction_id as transactionId, u2.username as username, u.username as consultantName, ct.room_id as roomId, ct.status as status, " +
+    @Query(nativeQuery = true, value = "select ct.transaction_id as transactionId, u2.user_id as userId, u2.username as username, u.user_id as consultantId, u.username as consultantName, " +
+            "ct.room_id as roomId, ct.status as status, " +
             "ct.created_time as createdTime, ct.last_update_time as lastUpdateTime " +
             "from consult_transaction ct " +
             "join user u on ct.consultant_id = u.user_id " +
