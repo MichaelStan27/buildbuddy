@@ -23,6 +23,9 @@ public class Chat {
     @Column(name = "chat_id", updatable = false, nullable = false)
     private Integer chatId;
 
+    @Column(name = "room_id", insertable = false, updatable = false)
+    private String roomId;
+
     @ManyToOne
     @JoinColumn(name = "room_id")
     private RoomMaster roomMaster;

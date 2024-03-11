@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.consult.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.consult.dto.param.ChatReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultTransactionReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
 import com.buildbuddy.domain.consult.dto.param.RoomChatReqParam;
@@ -8,6 +9,7 @@ import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
 import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.*;
 import com.buildbuddy.domain.consult.entity.*;
+import com.buildbuddy.domain.consult.repository.ChatRepository;
 import com.buildbuddy.domain.consult.repository.ConsultTransactionRepository;
 import com.buildbuddy.domain.consult.repository.ConsultantDetailRepository;
 import com.buildbuddy.domain.consult.repository.RoomMasterRepository;
@@ -60,6 +62,9 @@ public class ConsultService {
 
     @Autowired
     private RoomMasterRepository roomMasterRepository;
+
+    @Autowired
+    private ChatRepository chatRepository;
 
     @Autowired
     private BalanceTransactionRepository balanceTransactionRepository;
@@ -235,6 +240,41 @@ public class ConsultService {
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .message("success getting room chat list")
+                .data(data)
+                .build();
+    }
+
+    public DataResponse<Object> getChat(ChatReqParam param){
+        log.info("Getting chat by: {}", param);
+
+        boolean isPaginated = param.isPagination();
+        Integer pageNo = param.getPageNo();
+        Integer pageSize = param.getPageSize();
+        String sortBy = param.getSortBy();
+        String sortDirection = param.getSortDirection();
+
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+
+        Page<Chat> chatPage = chatRepository.findByRoomId(param.getRoomId(), pageable);
+
+        List<ChatDto> chatDto = chatPage.getContent().stream()
+                .map(ChatDto::convertToDto)
+                .toList();
+
+        ChatSchema data = ChatSchema.builder()
+                .chatList(chatDto)
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .totalPages(chatPage.getTotalPages())
+                .totalData(chatPage.getTotalElements())
+                .build();
+
+        return DataResponse.builder()
+                .httpStatus(HttpStatus.OK)
+                .timestamp(LocalDateTime.now())
+                .message("success getting chat list")
                 .data(data)
                 .build();
     }
