@@ -255,6 +255,7 @@ public class ConsultService {
     @Transactional
     public DataResponse<Object> transaction(TransactionReqDto dto){
         log.info("Start saving transaction detail");
+        log.info("req: {}", dto);
 
         ConsultTransaction consultTransaction = null;
         ConsultTransactionStatus status = null;

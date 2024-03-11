@@ -61,7 +61,11 @@ public class UserEntity {
 
     public BalanceTransaction getBalanceByConsultTransactionId(ConsultTransaction consultTransaction){
         return this.balanceTransactionList.stream()
-                .filter(b -> b.getConsultTransaction().getTransactionId().equals(consultTransaction.getTransactionId()))
+                .filter(b -> {
+                    if(b.getConsultTransaction() != null)
+                        return b.getConsultTransaction().getTransactionId().equals(consultTransaction.getTransactionId());
+                    return false;
+                })
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("Cant find balance transaction by consult transaction "));
     }
