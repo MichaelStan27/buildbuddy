@@ -217,15 +217,14 @@ public class ConsultService {
         String sortBy = param.getSortBy();
         String sortDirection = param.getSortDirection();
 
-        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+        Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<RoomMaster> roomMasterPage = getRoomMasterFromDB(param, pageable);
+        Page<RoomMasterModel> roomMasterPage = roomMasterRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), param.isActive(), pageable);
 
         List<RoomMasterDto> dtoList = roomMasterPage.getContent().stream()
                 .map(RoomMasterDto::convertToDto)
-                .filter(r -> param.isExpired() == r.getIsExpired())
                 .toList();
 
         RoomMasterSchema data = RoomMasterSchema.builder()
@@ -277,20 +276,6 @@ public class ConsultService {
                 .message("success getting chat list")
                 .data(data)
                 .build();
-    }
-
-    private Page<RoomMaster> getRoomMasterFromDB(RoomChatReqParam param, Pageable pageable){
-        log.info("Getting room master from DB...");
-
-        List<ParamFilter> paramFilters = param.getFilter();
-        Page<RoomMaster> data = null;
-
-        if(paramFilters.isEmpty())
-            data = roomMasterRepository.findAll(pageable);
-        else
-            data = roomMasterRepository.findAll(roomMasterSpecCreator.getSpecification(paramFilters), pageable);
-
-        return data;
     }
 
     @Transactional

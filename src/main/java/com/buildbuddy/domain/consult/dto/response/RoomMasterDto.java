@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.consult.dto.response;
 
 import com.buildbuddy.domain.consult.entity.RoomMaster;
+import com.buildbuddy.domain.consult.entity.RoomMasterModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -45,6 +46,15 @@ public class RoomMasterDto {
                 .createdTime(e.getCreatedTime())
                 .expiredTime(expiredTime)
                 .isExpired(!LocalDateTime.now().isBefore(expiredTime))
+                .build();
+    }
+
+    public static RoomMasterDto convertToDto(RoomMasterModel m){
+        return RoomMasterDto.builder()
+                .roomId(m.getRoomId())
+                .user(m.getUsername())
+                .consultant(m.getConsultantName())
+                .createdTime(m.getCreatedTime())
                 .build();
     }
 

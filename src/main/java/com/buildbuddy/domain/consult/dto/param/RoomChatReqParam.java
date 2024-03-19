@@ -16,14 +16,12 @@ import java.util.List;
 @AllArgsConstructor
 public class RoomChatReqParam {
 
-    private List<String> roomIdList;
+    private Integer userId;
 
-    private List<Integer> userIdList;
-
-    private List<Integer> consultantIdList;
+    private Integer consultantId;
 
     @Builder.Default
-    private boolean expired = false;
+    private boolean active = false;
 
     @Builder.Default
     private boolean pagination = false;
@@ -39,35 +37,5 @@ public class RoomChatReqParam {
 
     @Builder.Default
     private String sortDirection = "asc";
-
-    public List<ParamFilter> getFilter(){
-        List<ParamFilter> filters = new ArrayList<>();
-
-        if(roomIdList != null && !roomIdList.isEmpty()){
-            filters.add(ParamFilter.builder()
-                            .field("roomId")
-                            .operator(QueryOperator.IN)
-                            .values(roomIdList)
-                    .build());
-        }
-
-        if(userIdList != null && !userIdList.isEmpty()){
-            filters.add(ParamFilter.builder()
-                    .field("userId")
-                    .operator(QueryOperator.IN)
-                    .values(userIdList)
-                    .build());
-        }
-
-        if(consultantIdList != null && !consultantIdList.isEmpty()){
-            filters.add(ParamFilter.builder()
-                    .field("consultantId")
-                    .operator(QueryOperator.IN)
-                    .values(consultantIdList)
-                    .build());
-        }
-
-        return filters;
-    }
 
 }
