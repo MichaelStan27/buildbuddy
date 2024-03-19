@@ -22,6 +22,9 @@ public class CommentResponseDto {
     @JsonProperty(value = "username")
     private String username;
 
+    @JsonProperty(value = "userId")
+    private Integer userId;
+
     @JsonProperty(value = "message")
     private String message;
 
@@ -36,10 +39,11 @@ public class CommentResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
 
-    public static CommentResponseDto convertToDto(CommentEntity entity){
+        public static CommentResponseDto convertToDto(CommentEntity entity){
         return CommentResponseDto.builder()
                 .commentId(entity.getId())
                 .username(entity.getUser().getUsername())
+                .userId(entity.getUser().getId())
                 .message(entity.getMessage())
                 .threadId(entity.getThread().getId())
                 .createdTime(entity.getCreatedTime())

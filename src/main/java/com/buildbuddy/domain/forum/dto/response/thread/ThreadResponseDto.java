@@ -25,6 +25,9 @@ public class ThreadResponseDto {
     @JsonProperty(value = "username")
     private String username;
 
+    @JsonProperty(value = "userId")
+    private Integer userId;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonProperty(value = "createdTime")
     private LocalDateTime createdTime;
@@ -38,6 +41,7 @@ public class ThreadResponseDto {
                 .threadId(entity.getId())
                 .post(entity.getPost())
                 .username(entity.getUser().getUsername())
+                .userId(entity.getUser().getId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();
