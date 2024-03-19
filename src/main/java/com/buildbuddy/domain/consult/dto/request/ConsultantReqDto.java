@@ -15,9 +15,12 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ConsultantReqDto {
 
-    @JsonProperty(value = "description")
+    @JsonProperty
     private String description;
 
-    @JsonProperty(value = "fee")
+    @JsonProperty
     private BigDecimal fee;
+
+    @JsonProperty
+    private Boolean available;
 }

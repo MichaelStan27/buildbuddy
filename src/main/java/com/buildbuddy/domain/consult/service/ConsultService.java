@@ -100,10 +100,12 @@ public class ConsultService {
                     .build();
 
             currentUser.setConsultantDetail(detail);
+            currentUser.setRole("consultant");
         }
         else{
             userDetail.setFee(fee);
             userDetail.setDescription(desc);
+            userDetail.setAvailable(consultantReqDto.getAvailable() ? 1 : 0);
         }
 
         currentUser = userRepository.saveAndFlush(currentUser);
