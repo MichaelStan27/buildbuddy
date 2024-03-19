@@ -33,6 +33,6 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
     @Query(nativeQuery = true, value = "update consult_transaction ct " +
             "join room_master rm on ct.room_id = rm.room_id " +
             "set ct.status = 'COMPLETED' " +
-            "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= NOW() and ct.status = 'ON_PROGRESS' ")
+            "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= CONVERT_TZ(NOW(), 'UTC', '+07:00') and ct.status = 'ON_PROGRESS' ")
     Integer autoComplete();
 }
