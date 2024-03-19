@@ -38,6 +38,14 @@ public class PaypalController {
         return new ResponseEntity<>("success", HttpStatus.OK);
     }
 
+    @PostMapping(value = "/payout/create")
+    public ResponseEntity<Object> payout(@RequestBody PaypalReqDto payoutOrder, HttpServletRequest request) throws PayPalRESTException {
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
+        paypalService.payout(payoutOrder.getAmount(), payoutOrder.getEmail());
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>("success", HttpStatus.OK);
+    }
 
 }

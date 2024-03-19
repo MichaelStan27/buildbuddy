@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -76,4 +79,19 @@ public class PaypalService {
         return payment.execute(apiContext, paymentExecution);
     }
 
+    public void payout(double amount, String receiverEmail) throws PayPalRESTException {
+        PayoutSenderBatchHeader payoutSenderBatchHeader = new PayoutSenderBatchHeader();
+        payoutSenderBatchHeader.setSenderBatchId("Payouts_" + LocalDateTime.now().toString());
+        payoutSenderBatchHeader.setEmailSubject("Consultant Payment");
+        payoutSenderBatchHeader.setRecipientType("EMAIL");
+        List<PayoutItem> payoutItems = new ArrayList<>();
+
+        payoutItems.add(new PayoutItem(new Currency(currency, String.format("%.2f", amount)), receiverEmail));
+        Payout payout = new Payout();
+
+        payout.setSenderBatchHeader(payoutSenderBatchHeader);
+        payout.setItems(payoutItems);
+
+        payout.create(apiContext, null);
+    }
 }

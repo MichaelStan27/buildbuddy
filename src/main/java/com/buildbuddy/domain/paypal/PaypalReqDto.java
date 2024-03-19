@@ -12,7 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class PaypalReqDto {
 
-    @JsonProperty("amount")
+    @JsonProperty
     private Double amount;
+
+    @JsonProperty
+    private String email;
 
 }
