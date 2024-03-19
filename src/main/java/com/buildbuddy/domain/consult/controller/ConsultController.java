@@ -78,6 +78,16 @@ public class ConsultController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
+    @GetMapping("/auto-complete")
+    public ResponseEntity<Object> autoComplete(HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = consultService.autoComplete();
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
     @PostMapping("/transaction")
     public ResponseEntity<Object> transaction(@RequestBody TransactionReqDto body, HttpServletRequest request){
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());

@@ -5,6 +5,7 @@ import com.buildbuddy.domain.consult.entity.ConsultTransactionModel;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -28,4 +29,10 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
             "where user_id = :userId and consultant_id = :consultantId and status = 'PENDING' ")
     Optional<ConsultTransaction> getPendingTransaction(@Param("userId") Integer userId, @Param("consultantId") Integer consultantId);
 
+    @Modifying
+    @Query(nativeQuery = true, value = "update consult_transaction ct " +
+            "join room_master rm on ct.room_id = rm.room_id " +
+            "set ct.status = 'COMPLETED' " +
+            "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= NOW() and ct.status = 'ON_PROGRESS' ")
+    Integer autoComplete();
 }

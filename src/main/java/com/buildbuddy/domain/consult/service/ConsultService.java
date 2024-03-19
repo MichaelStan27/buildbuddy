@@ -204,6 +204,20 @@ public class ConsultService {
                 .build();
     }
 
+    @Transactional
+    public DataResponse<Object> autoComplete(){
+        log.info("Executing autocomplete");
+
+        Integer rowUpdated = consultTransactionRepository.autoComplete();
+
+        log.info("Autocomplete: {} transaction completed", rowUpdated);
+        return DataResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message("Success executing auto complete")
+                .build();
+    }
+
     private String createLikeKeyword(String word){
         return word != null ? "%" + word.toUpperCase() + "%" : null;
     }
