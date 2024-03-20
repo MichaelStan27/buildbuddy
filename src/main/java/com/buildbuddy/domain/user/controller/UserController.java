@@ -33,6 +33,16 @@ public class UserController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
+    @GetMapping("/get-detail")
+    public ResponseEntity<Object> getUser(@RequestParam Integer userId, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = userService.getUser(userId);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody UserRequestDto userDto,
             HttpServletRequest request){

@@ -64,6 +64,20 @@ public class UserService {
                 .build();
     }
 
+    public DataResponse<Object> getUser(Integer userId){
+
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
+
+        UserResponseDto data = UserResponseDto.convertToDto(user);
+
+        return DataResponse.<Object>builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .data(data)
+                .message("Success getting user")
+                .build();
+    }
+
     @Transactional
     public DataResponse<UserResponseDto> createUser(UserRequestDto userDto){
 

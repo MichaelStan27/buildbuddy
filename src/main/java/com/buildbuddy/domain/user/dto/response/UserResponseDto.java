@@ -1,5 +1,6 @@
 package com.buildbuddy.domain.user.dto.response;
 
+import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -36,7 +37,18 @@ public class UserResponseDto {
     @JsonProperty(value = "balance")
     private BigDecimal balance;
 
+    @JsonProperty(value = "description")
+    private String description;
+
+    @JsonProperty(value = "fee")
+    private BigDecimal fee;
+
+    @JsonProperty(value = "isAvailable")
+    private Boolean isAvailable;
+
     public static UserResponseDto convertToDto(UserEntity entity){
+        ConsultantDetail consultantDetail = entity.getConsultantDetail();
+
         return UserResponseDto.builder()
                 .userId(entity.getId())
                 .username(entity.getUsername())
@@ -45,6 +57,9 @@ public class UserResponseDto {
                 .gender(entity.getGender())
                 .role(entity.getRole())
                 .balance(entity.getBalance())
+                .description(consultantDetail != null ? consultantDetail.getDescription() : null)
+                .fee(consultantDetail != null ? consultantDetail.getFee() : null)
+                .isAvailable(consultantDetail != null ? consultantDetail.getAvailable() != 0 : null)
                 .build();
     }
 
