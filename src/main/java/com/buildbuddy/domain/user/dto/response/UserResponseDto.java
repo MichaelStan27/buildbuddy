@@ -16,34 +16,40 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class UserResponseDto {
 
-    @JsonProperty("userId")
+    @JsonProperty
     private Integer userId;
 
-    @JsonProperty(value = "username")
+    @JsonProperty
     private String username;
 
-    @JsonProperty(value = "email")
+    @JsonProperty
     private String email;
 
-    @JsonProperty(value = "age")
+    @JsonProperty
     private Integer age;
 
-    @JsonProperty(value = "gender")
+    @JsonProperty
     private String gender;
 
-    @JsonProperty(value = "role")
+    @JsonProperty
     private String role;
 
-    @JsonProperty(value = "balance")
+    @JsonProperty
     private BigDecimal balance;
 
-    @JsonProperty(value = "description")
+    @JsonProperty
+    private String formattedBalance;
+
+    @JsonProperty
     private String description;
 
-    @JsonProperty(value = "fee")
+    @JsonProperty
     private BigDecimal fee;
 
-    @JsonProperty(value = "isAvailable")
+    @JsonProperty
+    private String formattedFee;
+
+    @JsonProperty
     private Boolean isAvailable;
 
     public static UserResponseDto convertToDto(UserEntity entity){
@@ -57,8 +63,10 @@ public class UserResponseDto {
                 .gender(entity.getGender())
                 .role(entity.getRole())
                 .balance(entity.getBalance())
+                .formattedBalance(String.format("%,.2f", entity.getBalance()))
                 .description(consultantDetail != null ? consultantDetail.getDescription() : null)
                 .fee(consultantDetail != null ? consultantDetail.getFee() : null)
+                .formattedFee(consultantDetail != null ? String.format("%,.2f", consultantDetail.getFee()) : null)
                 .isAvailable(consultantDetail != null ? consultantDetail.getAvailable() != 0 : null)
                 .build();
     }
