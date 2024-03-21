@@ -1,11 +1,13 @@
 package com.buildbuddy.domain.paypal;
 
+import com.buildbuddy.jsonresponse.DataResponse;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -29,7 +31,7 @@ public class PaypalService {
     @Value("${spring.paypal.success-url}")
     private String successUrl;
 
-    public String createPayment(Double total) throws PayPalRESTException {
+    public DataResponse<String> createPayment(Double total) throws PayPalRESTException {
         Amount amount = new Amount();
         amount.setCurrency(currency);
         amount.setTotal(String.format(Locale.forLanguageTag(currency), "%.2f", total));
@@ -66,20 +68,32 @@ public class PaypalService {
                     .orElseThrow(() -> new RuntimeException("cant find approval url"));
         }
 
-        return redirectUrl;
+        return DataResponse.<String>builder()
+                .timestamp(LocalDateTime.now())
+                .message("Success getting redirect url")
+                .httpStatus(HttpStatus.OK)
+                .data(redirectUrl)
+                .build();
     }
 
-    public Payment executePayment(String paymentId, String payerId) throws PayPalRESTException {
+    public DataResponse<String> executePayment(String paymentId, String payerId) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
 
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
 
-        return payment.execute(apiContext, paymentExecution);
+       payment.execute(apiContext, paymentExecution);
+
+       return DataResponse.<String>builder()
+               .timestamp(LocalDateTime.now())
+               .message("Success executing payment")
+               .httpStatus(HttpStatus.OK)
+               .data(payment.getId())
+               .build();
     }
 
-    public void payout(double amount, String receiverEmail) throws PayPalRESTException {
+    public DataResponse<Object> payout(double amount, String receiverEmail) throws PayPalRESTException {
         PayoutSenderBatchHeader payoutSenderBatchHeader = new PayoutSenderBatchHeader();
         payoutSenderBatchHeader.setSenderBatchId("Payouts_" + LocalDateTime.now().toString());
         payoutSenderBatchHeader.setEmailSubject("Consultant Payment");
@@ -93,5 +107,10 @@ public class PaypalService {
         payout.setItems(payoutItems);
 
         payout.create(apiContext, null);
+        return DataResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .message("Success executing payout")
+                .httpStatus(HttpStatus.OK)
+                .build();
     }
 }

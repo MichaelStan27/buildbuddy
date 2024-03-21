@@ -1,11 +1,10 @@
 package com.buildbuddy.domain.paypal;
 
-import com.paypal.api.payments.Payment;
+import com.buildbuddy.jsonresponse.DataResponse;
 import com.paypal.base.rest.PayPalRESTException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,10 +20,10 @@ public class PaypalController {
     public ResponseEntity<Object> createPayment(@RequestBody PaypalReqDto body, HttpServletRequest request) throws PayPalRESTException {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
-        String redirectUrl = paypalService.createPayment(body.getAmount());
+        DataResponse<String> response = paypalService.createPayment(body.getAmount());
 
         log.info("Success Executing Request on {}", request.getServletPath());
-        return new ResponseEntity<>(redirectUrl, HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
     @GetMapping("/payment/execute")
@@ -32,20 +31,20 @@ public class PaypalController {
                                                  HttpServletRequest request) throws PayPalRESTException {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
-        Payment payment = paypalService.executePayment(paymentId, payerId);
+        DataResponse<String> response = paypalService.executePayment(paymentId, payerId);
 
         log.info("Success Executing Request on {}", request.getServletPath());
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
     @PostMapping(value = "/payout/create")
     public ResponseEntity<Object> payout(@RequestBody PaypalReqDto payoutOrder, HttpServletRequest request) throws PayPalRESTException {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
-        paypalService.payout(payoutOrder.getAmount(), payoutOrder.getEmail());
+        DataResponse<Object> response = paypalService.payout(payoutOrder.getAmount(), payoutOrder.getEmail());
 
         log.info("Success Executing Request on {}", request.getServletPath());
-        return new ResponseEntity<>("success", HttpStatus.OK);
+        return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
 }
