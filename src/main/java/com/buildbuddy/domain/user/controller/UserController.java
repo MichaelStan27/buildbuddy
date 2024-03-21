@@ -1,6 +1,6 @@
 package com.buildbuddy.domain.user.controller;
 
-import com.buildbuddy.domain.user.dto.request.BalanceReqDto;
+import com.buildbuddy.domain.user.dto.BalanceTransactionReqParam;
 import com.buildbuddy.domain.user.dto.request.UserRequestDto;
 import com.buildbuddy.domain.user.dto.response.UserResponseDto;
 import com.buildbuddy.domain.user.service.UserService;
@@ -9,7 +9,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @Slf4j
@@ -55,14 +54,14 @@ public class UserController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-//    @PostMapping("/topup")
-//    public ResponseEntity<Object> topup(@RequestBody BalanceReqDto body, HttpServletRequest request){
-//        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
-//
-//        DataResponse<Object> response = userService.topup(body);
-//
-//        log.info("Success Executing Request on {}", request.getServletPath());
-//        return new ResponseEntity<>(response, response.getHttpStatus());
-//    }
+    @GetMapping("/get-balance-transaction")
+    public ResponseEntity<Object> getBalanceTransaction(BalanceTransactionReqParam reqParam, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = userService.getBalanceTrans(reqParam);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
 
 }

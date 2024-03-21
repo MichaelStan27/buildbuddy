@@ -1,6 +1,8 @@
 package com.buildbuddy.domain.user.repository;
 
 import com.buildbuddy.domain.user.entity.BalanceTransaction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,4 +17,5 @@ public interface BalanceTransactionRepository extends JpaRepository<BalanceTrans
                                                               @Param("userId") Integer userId,
                                                               @Param("transactionType") String transactionType);
 
+    Page<BalanceTransaction> findByUserId(Integer userId, Pageable pageable);
 }

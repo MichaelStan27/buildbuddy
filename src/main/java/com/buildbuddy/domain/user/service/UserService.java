@@ -1,15 +1,23 @@
 package com.buildbuddy.domain.user.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.user.dto.BalanceTransactionReqParam;
 import com.buildbuddy.domain.user.dto.request.UserRequestDto;
+import com.buildbuddy.domain.user.dto.response.BalanceTransDto;
+import com.buildbuddy.domain.user.dto.response.BalanceTransSchema;
 import com.buildbuddy.domain.user.dto.response.UserResponseDto;
+import com.buildbuddy.domain.user.entity.BalanceTransaction;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
 import com.buildbuddy.jsonresponse.DataResponse;
+import com.buildbuddy.util.PaginationCreator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -20,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -36,6 +45,9 @@ public class UserService {
 
     @Autowired
     private AuditorAwareImpl auditorAware;
+
+    @Autowired
+    private PaginationCreator paginationCreator;
 
     public DataResponse<UserResponseDto> getUserByUsername(String username){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -91,6 +103,40 @@ public class UserService {
         UserResponseDto data = UserResponseDto.convertToDto(user);
 
         return DataResponse.<UserResponseDto>builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.CREATED)
+                .message("Success creating user")
+                .data(data)
+                .build();
+    }
+
+    public DataResponse<Object> getBalanceTrans(BalanceTransactionReqParam param){
+
+        boolean isPaginated = param.isPagination();
+        Integer pageNo = param.getPageNo();
+        Integer pageSize = param.getPageSize();
+        String sortBy = param.getSortBy();
+        String sortDirection = param.getSortDirection();
+
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+
+        Page<BalanceTransaction> balanceTransactionPage = balanceTransactionRepository.findByUserId(param.getUserId(), pageable);
+
+        List<BalanceTransDto> balanceTransDtos = balanceTransactionPage.stream()
+                .map(BalanceTransDto::convertToDto)
+                .toList();
+
+        BalanceTransSchema data = BalanceTransSchema.builder()
+                .balanceTransactionList(balanceTransDtos)
+                .totalPages(balanceTransactionPage.getTotalPages())
+                .totalData(balanceTransactionPage.getTotalElements())
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .build();
+
+        return DataResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .httpStatus(HttpStatus.CREATED)
                 .message("Success creating user")

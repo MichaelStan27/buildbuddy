@@ -27,6 +27,9 @@ public class BalanceTransaction {
     @Column(name = "transaction_id", updatable = false, nullable = false)
     private Integer transactionId;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private Integer userId;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserEntity user;
