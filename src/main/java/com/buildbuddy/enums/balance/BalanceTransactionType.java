@@ -7,7 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BalanceTransactionType {
 
-    TOP_UP("TOP_UP"),
+    PAYPAL("PAYPAL"),
     CONSULT("CONSULT");
 
     private String value;

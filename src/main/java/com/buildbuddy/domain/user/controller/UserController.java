@@ -55,14 +55,14 @@ public class UserController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @PostMapping("/topup")
-    public ResponseEntity<Object> topup(@RequestBody BalanceReqDto body, HttpServletRequest request){
-        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
-
-        DataResponse<Object> response = userService.topup(body);
-
-        log.info("Success Executing Request on {}", request.getServletPath());
-        return new ResponseEntity<>(response, response.getHttpStatus());
-    }
+//    @PostMapping("/topup")
+//    public ResponseEntity<Object> topup(@RequestBody BalanceReqDto body, HttpServletRequest request){
+//        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+//
+//        DataResponse<Object> response = userService.topup(body);
+//
+//        log.info("Success Executing Request on {}", request.getServletPath());
+//        return new ResponseEntity<>(response, response.getHttpStatus());
+//    }
 
 }

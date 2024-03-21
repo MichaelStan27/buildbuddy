@@ -1,15 +1,24 @@
 package com.buildbuddy.domain.paypal;
 
+import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.user.entity.BalanceTransaction;
+import com.buildbuddy.domain.user.entity.UserEntity;
+import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
+import com.buildbuddy.domain.user.repository.UserRepository;
+import com.buildbuddy.enums.balance.BalanceTransactionStatus;
+import com.buildbuddy.enums.balance.BalanceTransactionType;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.paypal.api.payments.*;
 import com.paypal.base.rest.APIContext;
 import com.paypal.base.rest.PayPalRESTException;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +32,15 @@ public class PaypalService {
     @Autowired
     private APIContext apiContext;
 
+    @Autowired
+    private BalanceTransactionRepository balanceTransactionRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuditorAwareImpl audit;
+
     private final String currency = "USD";
 
     @Value("${spring.paypal.cancel-url}")
@@ -32,6 +50,7 @@ public class PaypalService {
     private String successUrl;
 
     public DataResponse<String> createPayment(Double total) throws PayPalRESTException {
+        log.info("Creating Payment");
         Amount amount = new Amount();
         amount.setCurrency(currency);
         amount.setTotal(String.format(Locale.forLanguageTag(currency), "%.2f", total));
@@ -68,6 +87,7 @@ public class PaypalService {
                     .orElseThrow(() -> new RuntimeException("cant find approval url"));
         }
 
+        log.info("Payment Created");
         return DataResponse.<String>builder()
                 .timestamp(LocalDateTime.now())
                 .message("Success getting redirect url")
@@ -76,15 +96,37 @@ public class PaypalService {
                 .build();
     }
 
+    @Transactional
     public DataResponse<String> executePayment(String paymentId, String payerId) throws PayPalRESTException {
+        log.info("Executing payment");
+        UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("Not Authenticated"));
+
         Payment payment = new Payment();
         payment.setId(paymentId);
 
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
 
-       payment.execute(apiContext, paymentExecution);
+       Payment executedPayment = payment.execute(apiContext, paymentExecution);
 
+       Transaction transaction = executedPayment.getTransactions().get(0);
+
+       BigDecimal amount = new BigDecimal(transaction.getAmount().getTotal());
+       BalanceTransaction balanceTransaction = BalanceTransaction.builder()
+               .nominal(amount)
+               .status(BalanceTransactionStatus.ADDED.getValue())
+               .transactionType(BalanceTransactionType.PAYPAL.getValue())
+               .user(user)
+               .build();
+
+       UserEntity tobeUpdateUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User Not Found"));
+
+       tobeUpdateUser.setBalance(tobeUpdateUser.getBalance().add(amount));
+
+       balanceTransactionRepository.saveAndFlush(balanceTransaction);
+       userRepository.saveAndFlush(tobeUpdateUser);
+
+       log.info("Payment Executed.");
        return DataResponse.<String>builder()
                .timestamp(LocalDateTime.now())
                .message("Success executing payment")
