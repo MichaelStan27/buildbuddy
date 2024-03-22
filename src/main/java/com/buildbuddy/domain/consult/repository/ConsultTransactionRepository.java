@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ConsultTransactionRepository extends JpaRepository<ConsultTransaction, Integer> {
@@ -29,10 +30,10 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
             "where user_id = :userId and consultant_id = :consultantId and status = 'PENDING' ")
     Optional<ConsultTransaction> getPendingTransaction(@Param("userId") Integer userId, @Param("consultantId") Integer consultantId);
 
-    @Modifying
-    @Query(nativeQuery = true, value = "update consult_transaction ct " +
-            "join room_master rm on ct.room_id = rm.room_id " +
-            "set ct.status = 'COMPLETED' " +
-            "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= CONVERT_TZ(NOW(), 'UTC', '+07:00') and ct.status = 'ON_PROGRESS' ")
-    Integer autoComplete();
+    @Query(nativeQuery = true, value = "select * from consult_transaction " +
+            "where transaction_id in ( " +
+                "select ct.transaction_id from consult_transaction ct join room_master rm on ct.room_id = rm.room_id " +
+                "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= CONVERT_TZ(NOW(), 'UTC', '+07:00') and ct.status = 'ON_PROGRESS' " +
+            ") ")
+    List<ConsultTransaction> getExpiredTransaction();
 }

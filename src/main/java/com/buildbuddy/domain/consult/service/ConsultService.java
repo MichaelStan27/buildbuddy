@@ -210,9 +210,28 @@ public class ConsultService {
     public DataResponse<Object> autoComplete(){
         log.info("Executing autocomplete");
 
-        Integer rowUpdated = consultTransactionRepository.autoComplete();
+        List<ConsultTransaction> expiredTransactionList = consultTransactionRepository.getExpiredTransaction();
+;
+        List<BalanceTransaction> balanceTransactionList = new ArrayList<>();
 
-        log.info("Autocomplete: {} transaction completed", rowUpdated);
+        expiredTransactionList.forEach(t ->{
+            UserEntity user = t.getUser();
+            UserEntity consultant = t.getConsultant();
+            BigDecimal consultantBalance = consultant.getBalance();
+            BigDecimal consultantFee = consultant.getConsultantDetail().getFee();
+            consultant.setBalance(consultantBalance.add(consultantFee));
+            log.info("Consultant Balance added by: {}", consultantFee);
+
+            BalanceTransaction userTrans = user.getBalanceByConsultTransactionId(t);
+            userTrans.setStatus(BalanceTransactionStatus.DEDUCTED.getValue());
+            BalanceTransaction consultTrans = createBalanceTrans(consultant, t, consultantFee, BalanceTransactionStatus.ADDED, BalanceTransactionType.CONSULT);
+            balanceTransactionList.addAll(List.of(userTrans, consultTrans));
+            t.setStatus(ConsultTransactionStatus.COMPLETED.getValue());
+        });
+
+        consultTransactionRepository.saveAllAndFlush(expiredTransactionList);
+        balanceTransactionRepository.saveAllAndFlush(balanceTransactionList);
+        log.info("Autocomplete: {} transaction completed", expiredTransactionList.size());
         return DataResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .httpStatus(HttpStatus.OK)
