@@ -3,6 +3,7 @@ package com.buildbuddy.domain.user.dto.response;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.paypal.base.codec.binary.Base64;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -52,6 +53,9 @@ public class UserResponseDto {
     @JsonProperty
     private Boolean isAvailable;
 
+    @JsonProperty
+    private String profilePicture;
+
     public static UserResponseDto convertToDto(UserEntity entity){
         ConsultantDetail consultantDetail = entity.getConsultantDetail();
 
@@ -63,6 +67,7 @@ public class UserResponseDto {
                 .gender(entity.getGender())
                 .role(entity.getRole())
                 .balance(entity.getBalance())
+                .profilePicture(Base64.encodeBase64String(entity.getProfilePicture()))
                 .formattedBalance(String.format("%,.2f", entity.getBalance()))
                 .description(consultantDetail != null ? consultantDetail.getDescription() : null)
                 .fee(consultantDetail != null ? consultantDetail.getFee() : null)
