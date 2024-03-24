@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.consult.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.consult.dto.EmailDto;
 import com.buildbuddy.domain.consult.dto.param.ChatReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultTransactionReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
@@ -27,6 +28,7 @@ import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
 import com.buildbuddy.util.spesification.ParamFilter;
 import com.buildbuddy.util.spesification.SpecificationCreator;
+import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -50,6 +53,9 @@ public class ConsultService {
 
     @Autowired
     private AuditorAwareImpl audit;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private UserRepository userRepository;
@@ -375,6 +381,12 @@ public class ConsultService {
 
                 BalanceTransaction userTrans = createBalanceTrans(user, consultTransaction, consultantFee, BalanceTransactionStatus.ON_HOLD, BalanceTransactionType.CONSULT);
                 balanceTransactionList.add(userTrans);
+
+                EmailDto email = EmailDto.builder()
+                        .to(consultant.getEmail())
+                        .body("There is a request of consult session from: " + user.getUsername() + " Accept now!")
+                        .build();
+                sendEmail(email);
             }
             case ON_PROGRESS -> {
                 String time = LocalDateTime.now().format(formatter);
@@ -388,6 +400,12 @@ public class ConsultService {
 
                 roomMasterRepository.saveAndFlush(roomMaster);
                 consultTransaction.setRoomMaster(roomMaster);
+
+                EmailDto email = EmailDto.builder()
+                        .to(user.getEmail())
+                        .body("Your Consult Session With " + consultant.getUsername() + " is accepted, go chat now!")
+                        .build();
+                sendEmail(email);
             }
             case REJECTED -> {
                 BigDecimal userBalance = user.getBalance();
@@ -398,6 +416,11 @@ public class ConsultService {
                 BalanceTransaction userTrans = user.getBalanceByConsultTransactionId(consultTransaction);
                 userTrans.setStatus(BalanceTransactionStatus.RETURNED.getValue());
                 balanceTransactionList.add(userTrans);
+                EmailDto email = EmailDto.builder()
+                        .to(user.getEmail())
+                        .body("Your Consult Session With " + consultant.getUsername() + " is rejected, " + consultantFee + " is added back to your balance")
+                        .build();
+                sendEmail(email);
             }
             case COMPLETED -> {
                 BigDecimal consultantBalance = consultant.getBalance();
@@ -409,6 +432,16 @@ public class ConsultService {
                 userTrans.setStatus(BalanceTransactionStatus.DEDUCTED.getValue());
                 BalanceTransaction consultTrans = createBalanceTrans(consultant, consultTransaction, consultantFee, BalanceTransactionStatus.ADDED, BalanceTransactionType.CONSULT);
                 balanceTransactionList.addAll(List.of(userTrans, consultTrans));
+                EmailDto email = EmailDto.builder()
+                        .to(user.getEmail())
+                        .body("Your Consult Session With " + consultant.getUsername() + " is completed")
+                        .build();
+                sendEmail(email);
+
+                EmailDto emailConsultant = EmailDto.builder()
+                        .to(consultant.getEmail())
+                        .body("Your Consult Session With " + user.getUsername() + " is completed, " + consultantFee + " is added to your balance")
+                        .build();
             }
         }
 
@@ -428,6 +461,14 @@ public class ConsultService {
                 .message("Success saving transaction detail")
                 .data(data)
                 .build();
+    }
+
+    private void sendEmail(EmailDto email){
+        try {
+            emailService.sendEmail(email);
+        } catch (MessagingException | IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private BalanceTransaction createBalanceTrans(UserEntity user, ConsultTransaction consultTransaction, BigDecimal nominal, BalanceTransactionStatus status, BalanceTransactionType type){
