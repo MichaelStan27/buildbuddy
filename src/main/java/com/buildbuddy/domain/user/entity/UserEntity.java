@@ -47,6 +47,9 @@ public class UserEntity {
     @Column(name = "balance")
     private BigDecimal balance;
 
+    @Column(name = "profile_picture")
+    private byte[] profilePicture;
+
     @Column(name = "created_time")
     private LocalDateTime createdTime;
 

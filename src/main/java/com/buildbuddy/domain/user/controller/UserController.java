@@ -10,6 +10,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @RestController
@@ -59,6 +62,16 @@ public class UserController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
         DataResponse<Object> response = userService.getBalanceTrans(reqParam);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @PostMapping("/upload-profile")
+    public ResponseEntity<Object> updateProfile(@RequestParam Integer userId, @RequestParam("file") MultipartFile file, HttpServletRequest request) throws IOException {
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = userService.uploadProfile(userId, file);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());

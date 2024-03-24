@@ -12,6 +12,7 @@ import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
+import com.paypal.base.codec.binary.Base64;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,9 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -141,6 +144,22 @@ public class UserService {
                 .httpStatus(HttpStatus.CREATED)
                 .message("Success creating user")
                 .data(data)
+                .build();
+    }
+
+    public DataResponse<Object> uploadProfile(Integer userId, MultipartFile file) throws IOException {
+
+        UserEntity user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("user not found"));
+
+        user.setProfilePicture(file.getBytes());
+
+        userRepository.saveAndFlush(user);
+
+        return DataResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message("Success updating profile")
+                .data(Base64.encodeBase64String(file.getBytes()))
                 .build();
     }
 }
