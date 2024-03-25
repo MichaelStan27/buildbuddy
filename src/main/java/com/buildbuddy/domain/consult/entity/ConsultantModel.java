@@ -8,6 +8,8 @@ public interface ConsultantModel {
 
     String getUsername();
 
+    byte[] getProfile();
+
     String getEmail();
 
     Integer getAge();
