@@ -13,7 +13,8 @@ import java.util.List;
 
 public interface RoomMasterRepository extends JpaRepository<RoomMaster, String>, JpaSpecificationExecutor<RoomMaster> {
 
-    @Query(nativeQuery = true, value = "select rm.room_id as roomId, u1.username as username, u2.username as consultantName, rm.created_time as createdTime " +
+    @Query(nativeQuery = true, value = "select rm.room_id as roomId, u1.username as username, u1.profile_picture as userProfile, " +
+            "u2.username as consultantName, u2.profile_picture as consultantProfile, rm.created_time as createdTime " +
             "from room_master rm join user u1 on rm.user_id = u1.user_id " +
             "join user u2 on rm.consultant_id = u2.user_id " +
             "join consult_transaction ct on ct.room_id = rm.room_id " +

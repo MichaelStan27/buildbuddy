@@ -2,6 +2,7 @@ package com.buildbuddy.domain.consult.dto.response;
 
 import com.buildbuddy.domain.consult.entity.ConsultantModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.paypal.base.codec.binary.Base64;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,34 +16,39 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ConsultantDetailDto {
 
-    @JsonProperty(value = "consultantId")
+    @JsonProperty
     private Integer consultantId;
 
-    @JsonProperty(value = "username")
+    @JsonProperty
     private String username;
 
-    @JsonProperty(value = "email")
+    @JsonProperty
+    private String profilePicture;
+
+    @JsonProperty
     private String email;
 
-    @JsonProperty(value = "age")
+    @JsonProperty
     private Integer age;
 
-    @JsonProperty(value = "gender")
+    @JsonProperty
     private String gender;
 
-    @JsonProperty(value = "description")
+    @JsonProperty
     private String description;
 
-    @JsonProperty(value = "fee")
+    @JsonProperty
     private BigDecimal fee;
 
-    @JsonProperty(value = "isAvailable")
+    @JsonProperty
     private Boolean isAvailable;
 
     public static ConsultantDetailDto convertToDto(ConsultantModel m){
+        byte[] profile = m.getProfile();
         return ConsultantDetailDto.builder()
                 .consultantId(m.getConsultantId())
                 .username(m.getUsername())
+                .profilePicture(profile != null ? Base64.encodeBase64String(profile) : null)
                 .gender(m.getGender())
                 .email(m.getEmail())
                 .age(m.getAge())

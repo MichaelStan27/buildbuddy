@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Data
 @Builder
@@ -24,7 +25,13 @@ public class RoomMasterDto {
     private String user;
 
     @JsonProperty
+    private String userProfile;
+
+    @JsonProperty
     private String consultant;
+
+    @JsonProperty
+    private String consultantProfile;
 
     @JsonProperty
     @JsonFormat(pattern = "dd-MM-yyyy, HH:mm:ss")
@@ -37,23 +44,15 @@ public class RoomMasterDto {
     @JsonProperty
     private Boolean isExpired;
 
-    public static RoomMasterDto convertToDto(RoomMaster e){
-        LocalDateTime expiredTime = e.getCreatedTime().plusHours(1);
-        return RoomMasterDto.builder()
-                .roomId(e.getRoomId())
-                .user(e.getUser().getUsername())
-                .consultant(e.getConsultant().getUsername())
-                .createdTime(e.getCreatedTime())
-                .expiredTime(expiredTime)
-                .isExpired(!LocalDateTime.now().isBefore(expiredTime))
-                .build();
-    }
-
     public static RoomMasterDto convertToDto(RoomMasterModel m){
+        byte[] userProfile = m.getUserProfile();
+        byte[] consultantProfile = m.getConsultantProfile();
         return RoomMasterDto.builder()
                 .roomId(m.getRoomId())
                 .user(m.getUsername())
+                .userProfile(userProfile != null ? Base64.getEncoder().encodeToString(userProfile) : null)
                 .consultant(m.getConsultantName())
+                .consultantProfile(consultantProfile != null ? Base64.getEncoder().encodeToString(consultantProfile) : null)
                 .createdTime(m.getCreatedTime())
                 .build();
     }
