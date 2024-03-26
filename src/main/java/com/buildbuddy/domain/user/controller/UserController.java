@@ -45,13 +45,13 @@ public class UserController {
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody UserRequestDto userDto,
+    @PostMapping("/save")
+    public ResponseEntity<Object> save(@RequestBody UserRequestDto userDto,
             HttpServletRequest request){
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
         log.info("param: {}", userDto.getUsername());
 
-        DataResponse<UserResponseDto> response = userService.createUser(userDto);
+        DataResponse<UserResponseDto> response = userService.save(userDto);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());

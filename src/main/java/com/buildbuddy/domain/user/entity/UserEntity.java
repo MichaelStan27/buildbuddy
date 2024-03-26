@@ -3,6 +3,8 @@ package com.buildbuddy.domain.user.entity;
 import com.buildbuddy.domain.consult.entity.ConsultTransaction;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.buildbuddy.domain.user.dto.request.UserRequestDto;
+import com.buildbuddy.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -71,5 +73,25 @@ public class UserEntity {
                 })
                 .findAny()
                 .orElseThrow(() -> new RuntimeException("Cant find balance transaction by consult transaction "));
+    }
+
+    public void updateDetail(UserRequestDto dto){
+        String email = dto.getEmail();
+        Integer age = dto.getAge();
+        String gender = dto.getGender();
+
+        this.setEmail(email != null ? email : this.getEmail());
+        this.setAge(age != null ? age : this.getAge());
+        this.setGender(gender != null ? gender : this.getGender());
+        if(dto.getRole().equals(UserRole.CONSULTANT.getValue())){
+            ConsultantDetail detailConsultant = this.getConsultantDetail();
+            if(detailConsultant == null) throw new RuntimeException("Consultant Detail Not Found");
+            String description = dto.getDescription();
+            BigDecimal fee = dto.getFee();
+            Integer available = dto.getAvailable();
+            detailConsultant.setDescription(description != null ? description : detailConsultant.getDescription());
+            detailConsultant.setFee(fee != null ? fee : detailConsultant.getFee());
+            detailConsultant.setAvailable(available != null ? available : detailConsultant.getAvailable());
+        }
     }
 }

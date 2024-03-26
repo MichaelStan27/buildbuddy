@@ -6,7 +6,6 @@ import com.buildbuddy.domain.consult.dto.param.ChatReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultTransactionReqParam;
 import com.buildbuddy.domain.consult.dto.param.ConsultantReqParam;
 import com.buildbuddy.domain.consult.dto.param.RoomChatReqParam;
-import com.buildbuddy.domain.consult.dto.request.ConsultantReqDto;
 import com.buildbuddy.domain.consult.dto.request.TransactionReqDto;
 import com.buildbuddy.domain.consult.dto.response.*;
 import com.buildbuddy.domain.consult.entity.*;
@@ -22,11 +21,8 @@ import com.buildbuddy.enums.balance.BalanceTransactionStatus;
 import com.buildbuddy.enums.balance.BalanceTransactionType;
 import com.buildbuddy.enums.consult.ConsultTransactionStatus;
 import com.buildbuddy.enums.consult.ConsultTransactionWorkflow;
-import com.buildbuddy.enums.UserRole;
-import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
-import com.buildbuddy.util.spesification.ParamFilter;
 import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
@@ -45,7 +41,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -82,59 +77,6 @@ public class ConsultService {
     private SpecificationCreator<RoomMaster> roomMasterSpecCreator;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyyHHmmss");
-
-    @Transactional
-    public DataResponse<ConsultantDetailDto> save(ConsultantReqDto consultantReqDto){
-
-        BigDecimal fee = consultantReqDto.getFee();
-        String desc = consultantReqDto.getDescription();
-
-        UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() ->  new BadRequestException("Request not authenticated"));
-        log.info("current authenticated user: {}", currentUser.getUsername());
-
-        if(!currentUser.getRole().equals(UserRole.CONSULTANT.getValue()))
-            throw new RuntimeException("authenticated user is not a consultant");
-
-        ConsultantDetail userDetail = currentUser.getConsultantDetail();
-
-        if(userDetail == null){
-            ConsultantDetail detail = ConsultantDetail.builder()
-                    .user(currentUser)
-                    .fee(fee)
-                    .description(desc)
-                    .available(0)
-                    .build();
-
-            currentUser.setConsultantDetail(detail);
-            currentUser.setRole("consultant");
-        }
-        else{
-            userDetail.setFee(fee);
-            userDetail.setDescription(desc);
-            userDetail.setAvailable(consultantReqDto.getAvailable() ? 1 : 0);
-        }
-
-        currentUser = userRepository.saveAndFlush(currentUser);
-
-        ConsultantDetail savedDetail = currentUser.getConsultantDetail();
-
-        ConsultantDetailDto response = ConsultantDetailDto.builder()
-                .username(currentUser.getUsername())
-                .email(currentUser.getEmail())
-                .age(currentUser.getAge())
-                .gender(currentUser.getGender())
-                .description(savedDetail.getDescription())
-                .fee(savedDetail.getFee())
-                .isAvailable(savedDetail.getAvailable() != 0)
-                .build();
-
-        return DataResponse.<ConsultantDetailDto>builder()
-                .timestamp(LocalDateTime.now())
-                .httpStatus(HttpStatus.OK)
-                .message("Success saving consultant detail")
-                .data(response)
-                .build();
-    }
 
     public DataResponse<ConsultantSchema> get(ConsultantReqParam param){
         log.info("get consultant by param: {}", param);
