@@ -325,8 +325,9 @@ public class ConsultService {
                 balanceTransactionList.add(userTrans);
 
                 EmailDto email = EmailDto.builder()
+                        .username(consultant.getUsername())
                         .to(consultant.getEmail())
-                        .body("There is a request of consult session from: " + user.getUsername() + " Accept now!")
+                        .body("There is a request of consult session from " + user.getUsername() + ", accept now!")
                         .build();
                 sendEmail(email);
             }
@@ -344,6 +345,7 @@ public class ConsultService {
                 consultTransaction.setRoomMaster(roomMaster);
 
                 EmailDto email = EmailDto.builder()
+                        .username(user.getUsername())
                         .to(user.getEmail())
                         .body("Your Consult Session With " + consultant.getUsername() + " is accepted, go chat now!")
                         .build();
@@ -359,6 +361,7 @@ public class ConsultService {
                 userTrans.setStatus(BalanceTransactionStatus.RETURNED.getValue());
                 balanceTransactionList.add(userTrans);
                 EmailDto email = EmailDto.builder()
+                        .username(user.getUsername())
                         .to(user.getEmail())
                         .body("Your Consult Session With " + consultant.getUsername() + " is rejected, " + consultantFee + " is added back to your balance")
                         .build();
@@ -375,15 +378,18 @@ public class ConsultService {
                 BalanceTransaction consultTrans = createBalanceTrans(consultant, consultTransaction, consultantFee, BalanceTransactionStatus.ADDED, BalanceTransactionType.CONSULT);
                 balanceTransactionList.addAll(List.of(userTrans, consultTrans));
                 EmailDto email = EmailDto.builder()
+                        .username(user.getUsername())
                         .to(user.getEmail())
                         .body("Your Consult Session With " + consultant.getUsername() + " is completed")
                         .build();
                 sendEmail(email);
 
                 EmailDto emailConsultant = EmailDto.builder()
+                        .username(consultant.getUsername())
                         .to(consultant.getEmail())
                         .body("Your Consult Session With " + user.getUsername() + " is completed, " + consultantFee + " is added to your balance")
                         .build();
+                sendEmail(emailConsultant);
             }
         }
 
