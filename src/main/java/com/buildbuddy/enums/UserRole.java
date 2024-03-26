@@ -12,4 +12,12 @@ public enum UserRole {
     ADMIN("admin");
 
     private String value;
+
+    public static boolean isAValidRole(String role){
+        for(UserRole validRole: values()){
+            if(validRole.value.equals(role))
+                return true;
+        }
+        return false;
+    }
 }

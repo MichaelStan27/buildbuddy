@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.user.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.consult.entity.ConsultantDetail;
 import com.buildbuddy.domain.user.dto.BalanceTransactionReqParam;
 import com.buildbuddy.domain.user.dto.request.UserRequestDto;
 import com.buildbuddy.domain.user.dto.response.BalanceTransDto;
@@ -10,6 +11,7 @@ import com.buildbuddy.domain.user.entity.BalanceTransaction;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
+import com.buildbuddy.enums.UserRole;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
 import com.paypal.base.codec.binary.Base64;
@@ -86,20 +88,45 @@ public class UserService {
     }
 
     @Transactional
-    public DataResponse<UserResponseDto> createUser(UserRequestDto userDto){
+    public DataResponse<UserResponseDto> save(UserRequestDto userDto){
 
-        String pass = passwordEncoder.encode(userDto.getPassword());
+        UserEntity user = null;
 
-        UserEntity user = UserEntity.builder()
-                .username(userDto.getUsername())
-                .email(userDto.getEmail())
-                .password(pass)
-                .role("user")
-                .age(userDto.getAge())
-                .gender(userDto.getGender())
-                .balance(BigDecimal.ZERO)
-                .createdTime(LocalDateTime.now())
-                .build();
+        if(userDto.getUserId() == null){
+            log.info("Creating user");
+            String role = userDto.getRole();
+
+            if(!UserRole.isAValidRole(role))
+                throw new RuntimeException("role is not valid");
+            String pass = passwordEncoder.encode(userDto.getPassword());
+
+            user = UserEntity.builder()
+                    .username(userDto.getUsername())
+                    .email(userDto.getEmail())
+                    .password(pass)
+                    .role(role)
+                    .age(userDto.getAge())
+                    .gender(userDto.getGender())
+                    .balance(BigDecimal.ZERO)
+                    .createdTime(LocalDateTime.now())
+                    .build();
+
+            if(role.equals(UserRole.CONSULTANT.getValue())){
+                log.info("creating consultant detail");
+                ConsultantDetail consultantDetail = ConsultantDetail.builder()
+                        .user(user)
+                        .fee(userDto.getFee())
+                        .available(userDto.getAvailable())
+                        .description(userDto.getDescription())
+                        .build();
+                user.setConsultantDetail(consultantDetail);
+            }
+        }
+        else {
+            log.info("Updating user");
+            user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> new RuntimeException("User Not Found"));
+            user.updateDetail(userDto);
+        }
 
         user = userRepository.saveAndFlush(user);
 
@@ -107,8 +134,8 @@ public class UserService {
 
         return DataResponse.<UserResponseDto>builder()
                 .timestamp(LocalDateTime.now())
-                .httpStatus(HttpStatus.CREATED)
-                .message("Success creating user")
+                .httpStatus(HttpStatus.OK)
+                .message("Success saving user detail")
                 .data(data)
                 .build();
     }

@@ -1,11 +1,12 @@
 package com.buildbuddy.domain.user.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -13,21 +14,33 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserRequestDto {
 
-    @NotNull
-    @JsonProperty(value = "username")
+    @JsonProperty
+    private Integer userId;
+
+    @JsonProperty
     private String username;
 
-    @NotNull
-    @JsonProperty(value = "email")
+    @JsonProperty
+    private String role;
+
+    @JsonProperty
     private String email;
 
-    @NotNull
-    @JsonProperty(value = "password")
+    @JsonProperty
     private String password;
 
-    @JsonProperty(value = "age")
+    @JsonProperty
     private Integer age;
 
-    @JsonProperty(value = "gender")
+    @JsonProperty
     private String gender;
+
+    @JsonProperty
+    private String description;
+
+    @JsonProperty
+    private BigDecimal fee;
+
+    @JsonProperty
+    private Integer available;
 }
