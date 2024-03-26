@@ -47,7 +47,7 @@ public class EmailService {
 
         helper.addTo(emailDto.getTo());
 
-        helper.setSubject("Consultation Approval Notification");
+        helper.setSubject("Consultation Notification");
         htmlTemplate = htmlTemplate.replace("${body}", emailDto.getBody());
 
         helper.setText(htmlTemplate, true);
