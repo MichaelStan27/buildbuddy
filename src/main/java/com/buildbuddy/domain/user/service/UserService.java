@@ -147,12 +147,13 @@ public class UserService {
         Integer pageSize = param.getPageSize();
         String sortBy = param.getSortBy();
         String sortDirection = param.getSortDirection();
+        String search = param.getSearch() != null ? "%" + param.getSearch() + "%" : null;
 
         Sort sort = paginationCreator.createSort(sortDirection, sortBy);
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<BalanceTransaction> balanceTransactionPage = balanceTransactionRepository.findByUserId(param.getUserId(), pageable);
+        Page<BalanceTransaction> balanceTransactionPage = balanceTransactionRepository.findByIdAndSearch(param.getUserId(), search, pageable);
 
         List<BalanceTransDto> balanceTransDtos = balanceTransactionPage.stream()
                 .map(BalanceTransDto::convertToDto)
