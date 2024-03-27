@@ -37,7 +37,7 @@ public interface ConsultTransactionRepository extends JpaRepository<ConsultTrans
     @Query(nativeQuery = true, value = "select * from consult_transaction " +
             "where transaction_id in ( " +
                 "select ct.transaction_id from consult_transaction ct join room_master rm on ct.room_id = rm.room_id " +
-                "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= CONVERT_TZ(NOW(), 'UTC', '+07:00') and ct.status = 'ON_PROGRESS' " +
+                "where DATE_ADD(rm.created_time, INTERVAL 1 HOUR) <= NOW() and ct.status = 'ON_PROGRESS' " +
             ") and (user_id = :userId or consultant_id = :userId)")
     List<ConsultTransaction> getExpiredTransaction(@Param("userId") Integer userId);
 }
