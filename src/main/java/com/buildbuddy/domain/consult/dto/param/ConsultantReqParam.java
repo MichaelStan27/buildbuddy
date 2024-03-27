@@ -30,9 +30,9 @@ public class ConsultantReqParam {
     private Integer pageSize = 10;
 
     @Builder.Default
-    private String sortBy = "username";
+    private String sortBy = "available";
 
     @Builder.Default
-    private String sortDirection = "asc";
+    private String sortDirection = "desc";
 
 }

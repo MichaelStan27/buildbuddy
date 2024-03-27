@@ -88,8 +88,9 @@ public class ConsultService {
         String sortDirection = param.getSortDirection();
 
         Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
+        Sort sortUsername = paginationCreator.createAliasesSort("asc", "username");
 
-        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort.and(sortUsername), pageNo, pageSize);
 
         String username = createLikeKeyword(param.getUsername());
         String gender = param.getGender() != null ? param.getGender().toUpperCase() : null;
