@@ -11,13 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConsultantReqParam {
 
-    private String username;
-
-    private String gender;
-
-    private String description;
-
-    private Integer available;
+    private String search;
 
     // Pagination
     @Builder.Default

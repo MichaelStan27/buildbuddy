@@ -92,12 +92,9 @@ public class ConsultService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort.and(sortUsername), pageNo, pageSize);
 
-        String username = createLikeKeyword(param.getUsername());
-        String gender = param.getGender() != null ? param.getGender().toUpperCase() : null;
-        String desc = createLikeKeyword(param.getDescription());
-        Integer avail = param.getAvailable();
+        String search = createLikeKeyword(param.getSearch());
 
-        Page<ConsultantModel> consultantModelPage = consultantDetailRepository.getConsultantByCustomParam(username, gender, desc, avail, pageable);
+        Page<ConsultantModel> consultantModelPage = consultantDetailRepository.getConsultantByCustomParam(search, pageable);
 
         List<ConsultantDetailDto> dtoList = consultantModelPage.getContent().stream()
                 .map(ConsultantDetailDto::convertToDto)
@@ -133,7 +130,9 @@ public class ConsultService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ConsultTransactionModel> consultTransactionModels = consultTransactionRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), pageable);
+        String search = createLikeKeyword(param.getSearch());
+
+        Page<ConsultTransactionModel> consultTransactionModels = consultTransactionRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), search, pageable);
 
         List<ConsultTransactionDto> consultTransactionDtos = consultTransactionModels.getContent().stream()
                 .map(ConsultTransactionDto::convertToDto)
@@ -159,8 +158,10 @@ public class ConsultService {
     public DataResponse<Object> autoComplete(){
         log.info("Executing autocomplete");
 
-        List<ConsultTransaction> expiredTransactionList = consultTransactionRepository.getExpiredTransaction();
-;
+        UserEntity loggedUser = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        List<ConsultTransaction> expiredTransactionList = consultTransactionRepository.getExpiredTransaction(loggedUser.getId());
+
         List<BalanceTransaction> balanceTransactionList = new ArrayList<>();
 
         expiredTransactionList.forEach(t ->{
@@ -176,6 +177,20 @@ public class ConsultService {
             BalanceTransaction consultTrans = createBalanceTrans(consultant, t, consultantFee, BalanceTransactionStatus.ADDED, BalanceTransactionType.CONSULT);
             balanceTransactionList.addAll(List.of(userTrans, consultTrans));
             t.setStatus(ConsultTransactionStatus.COMPLETED.getValue());
+
+            EmailDto email = EmailDto.builder()
+                    .username(user.getUsername())
+                    .to(user.getEmail())
+                    .body("Your Consult Session With " + consultant.getUsername() + " auto is completed")
+                    .build();
+            sendEmail(email);
+
+            EmailDto emailConsultant = EmailDto.builder()
+                    .username(consultant.getUsername())
+                    .to(consultant.getEmail())
+                    .body("Your Consult Session With " + user.getUsername() + " is auto completed, " + consultantFee + " is added to your balance")
+                    .build();
+            sendEmail(emailConsultant);
         });
 
         consultTransactionRepository.saveAllAndFlush(expiredTransactionList);
@@ -205,7 +220,9 @@ public class ConsultService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<RoomMasterModel> roomMasterPage = roomMasterRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), param.isActive(), pageable);
+        String search = createLikeKeyword(param.getSearch());
+
+        Page<RoomMasterModel> roomMasterPage = roomMasterRepository.getByCustomParam(param.getUserId(), param.getConsultantId(), param.isActive(), search, pageable);
 
         List<RoomMasterDto> dtoList = roomMasterPage.getContent().stream()
                 .map(RoomMasterDto::convertToDto)
