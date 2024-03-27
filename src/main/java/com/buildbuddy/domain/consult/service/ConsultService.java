@@ -188,7 +188,7 @@ public class ConsultService {
             EmailDto emailConsultant = EmailDto.builder()
                     .username(consultant.getUsername())
                     .to(consultant.getEmail())
-                    .body("Your Consult Session With " + user.getUsername() + " is auto completed, " + consultantFee + " is added to your balance")
+                    .body("Your Consult Session With " + user.getUsername() + " is auto completed, $" + consultantFee + " is added to your balance")
                     .build();
             sendEmail(emailConsultant);
         });
@@ -381,7 +381,7 @@ public class ConsultService {
                 EmailDto email = EmailDto.builder()
                         .username(user.getUsername())
                         .to(user.getEmail())
-                        .body("Your Consult Session With " + consultant.getUsername() + " is rejected, " + consultantFee + " is added back to your balance")
+                        .body("Your Consult Session With " + consultant.getUsername() + " is rejected, $" + consultantFee + " is added back to your balance")
                         .build();
                 sendEmail(email);
             }
@@ -405,7 +405,7 @@ public class ConsultService {
                 EmailDto emailConsultant = EmailDto.builder()
                         .username(consultant.getUsername())
                         .to(consultant.getEmail())
-                        .body("Your Consult Session With " + user.getUsername() + " is completed, " + consultantFee + " is added to your balance")
+                        .body("Your Consult Session With " + user.getUsername() + " is completed, $" + consultantFee + " is added to your balance")
                         .build();
                 sendEmail(emailConsultant);
             }
