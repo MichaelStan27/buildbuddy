@@ -20,6 +20,8 @@ public class RoomChatReqParam {
 
     private Integer consultantId;
 
+    private String search;
+
     @Builder.Default
     private boolean active = false;
 

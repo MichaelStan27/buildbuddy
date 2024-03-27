@@ -18,4 +18,15 @@ public interface BalanceTransactionRepository extends JpaRepository<BalanceTrans
                                                               @Param("transactionType") String transactionType);
 
     Page<BalanceTransaction> findByUserId(Integer userId, Pageable pageable);
+
+    @Query(nativeQuery = true, value = "select * from balance_transaction " +
+            "where user_Id = :userId and " +
+            "( " +
+                "nominal like (case when :search is null then nominal else :search end) or " +
+                "status like (case when :search is null then status else :search end) or " +
+                "transaction_type like (case when :search is null then transaction_type else :search end) " +
+            ")")
+    Page<BalanceTransaction> findByIdAndSearch(@Param("userId") Integer userId,
+                                               @Param("search") String search,
+                                               Pageable pageable);
 }

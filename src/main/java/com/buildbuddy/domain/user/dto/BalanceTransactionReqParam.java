@@ -11,6 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BalanceTransactionReqParam {
 
+    private String search;
+
     private Integer userId;
 
     // Pagination
@@ -24,7 +26,7 @@ public class BalanceTransactionReqParam {
     private Integer pageSize = 10;
 
     @Builder.Default
-    private String sortBy = "lastUpdateTime";
+    private String sortBy = "last_update_time";
 
     @Builder.Default
     private String sortDirection = "desc";

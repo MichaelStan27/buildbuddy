@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class EmailDto {
 
+    private String username;
     private String to;
     private String body;
 

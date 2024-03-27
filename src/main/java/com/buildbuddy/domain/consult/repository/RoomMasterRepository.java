@@ -20,10 +20,13 @@ public interface RoomMasterRepository extends JpaRepository<RoomMaster, String>,
             "join consult_transaction ct on ct.room_id = rm.room_id " +
             "where rm.user_id = (case when :userId is null then rm.user_id else :userId end) " +
             "and rm.consultant_id = (case when :consultantId is null then rm.consultant_id else :consultantId end) " +
-            "and ct.status = (case when :isActive is true then 'ON_PROGRESS' else 'COMPLETED' end) ")
+            "and ct.status = (case when :isActive is true then 'ON_PROGRESS' else 'COMPLETED' end) " +
+            "and (u1.username like (case when :search is null then u1.username else :search end) " +
+            "or u2.username like (case when :search is null then u2.username else :search end))")
     Page<RoomMasterModel> getByCustomParam(@Param("userId") Integer userId,
                                            @Param("consultantId") Integer consultantId,
                                            @Param("isActive") Boolean isActive,
+                                           @Param("search") String search,
                                            Pageable pageable);
 
 }

@@ -11,13 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ConsultantReqParam {
 
-    private String username;
-
-    private String gender;
-
-    private String description;
-
-    private Integer available;
+    private String search;
 
     // Pagination
     @Builder.Default
@@ -30,9 +24,9 @@ public class ConsultantReqParam {
     private Integer pageSize = 10;
 
     @Builder.Default
-    private String sortBy = "username";
+    private String sortBy = "available";
 
     @Builder.Default
-    private String sortDirection = "asc";
+    private String sortDirection = "desc";
 
 }

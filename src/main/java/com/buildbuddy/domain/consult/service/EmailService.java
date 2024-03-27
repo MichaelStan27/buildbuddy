@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,17 +30,24 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Autowired
+    private TemplateEngine templateEngine;
+
     public void sendEmail(EmailDto emailDto) throws MessagingException, IOException {
         log.info("Start building Email...");
 
         MimeMessage message = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String htmlTemplate = readHtmlTemplate();
+        Context context = new Context();
+        context.setVariable("name", emailDto.getUsername());
+        context.setVariable("body", emailDto.getBody());
+
+        String htmlTemplate = templateEngine.process("mail-template", context);
 
         helper.addTo(emailDto.getTo());
 
-        helper.setSubject("Consultation Approval Notification");
+        helper.setSubject("Consultation Notification");
         htmlTemplate = htmlTemplate.replace("${body}", emailDto.getBody());
 
         helper.setText(htmlTemplate, true);
