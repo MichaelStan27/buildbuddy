@@ -28,7 +28,7 @@ public class PaypalController {
 
     @GetMapping("/payment/execute")
     public ResponseEntity<Object> executePayment(@RequestParam("paymentId") String paymentId, @RequestParam("PayerID") String payerId,
-                                                 HttpServletRequest request) throws PayPalRESTException {
+                                                 HttpServletRequest request) {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
         DataResponse<String> response = paypalService.executePayment(paymentId, payerId);

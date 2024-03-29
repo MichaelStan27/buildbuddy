@@ -97,7 +97,7 @@ public class PaypalService {
     }
 
     @Transactional
-    public DataResponse<String> executePayment(String paymentId, String payerId) throws PayPalRESTException {
+    public DataResponse<String> executePayment(String paymentId, String payerId) {
         log.info("Executing payment");
         UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("Not Authenticated"));
 
@@ -107,9 +107,17 @@ public class PaypalService {
         PaymentExecution paymentExecution = new PaymentExecution();
         paymentExecution.setPayerId(payerId);
 
-       Payment executedPayment = payment.execute(apiContext, paymentExecution);
+        Payment executedPayment = null;
+        try {
+            executedPayment = payment.execute(apiContext, paymentExecution);
+        } catch (PayPalRESTException e) {
+            if(e.getMessage().contains("The instrument presented was either declined")){
+                throw new RuntimeException("Insufficient paypal balance");
+            }
+            throw new RuntimeException(e);
+        }
 
-       Transaction transaction = executedPayment.getTransactions().get(0);
+        Transaction transaction = executedPayment.getTransactions().get(0);
 
        BigDecimal amount = new BigDecimal(transaction.getAmount().getTotal());
        BalanceTransaction balanceTransaction = BalanceTransaction.builder()
@@ -173,6 +181,9 @@ public class PaypalService {
         try{
             payout.create(apiContext, null);
         } catch (PayPalRESTException e){
+            if(e.getMessage().contains("Receiver is invalid")){
+                throw new RuntimeException("Email is invalid, please input a valid one");
+            }
             throw new RuntimeException(e.getMessage());
         }
 
