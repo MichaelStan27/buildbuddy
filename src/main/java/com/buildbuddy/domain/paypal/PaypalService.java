@@ -136,9 +136,27 @@ public class PaypalService {
     }
 
     @Transactional
-    public DataResponse<Object> payout(double amount, String receiverEmail) throws PayPalRESTException {
+    public DataResponse<Object> payout(double amount, String receiverEmail) {
         log.info("Executing payout");
         UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("Not Authenticated"));
+
+        BigDecimal nominal = BigDecimal.valueOf(amount);
+        BalanceTransaction balanceTransaction = BalanceTransaction.builder()
+                .nominal(nominal)
+                .status(BalanceTransactionStatus.DEDUCTED.getValue())
+                .transactionType(BalanceTransactionType.PAYPAL.getValue())
+                .user(user)
+                .build();
+
+        UserEntity tobeUpdateUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        if(tobeUpdateUser.getBalance().subtract(nominal).compareTo(BigDecimal.ONE) < 0)
+            throw new RuntimeException("Balance Amount Insufficient");
+
+        tobeUpdateUser.setBalance(tobeUpdateUser.getBalance().subtract(nominal));
+
+        balanceTransactionRepository.saveAndFlush(balanceTransaction);
+        userRepository.saveAndFlush(tobeUpdateUser);
 
         PayoutSenderBatchHeader payoutSenderBatchHeader = new PayoutSenderBatchHeader();
         payoutSenderBatchHeader.setSenderBatchId("Payouts_" + LocalDateTime.now().toString());
@@ -152,22 +170,11 @@ public class PaypalService {
         payout.setSenderBatchHeader(payoutSenderBatchHeader);
         payout.setItems(payoutItems);
 
-        payout.create(apiContext, null);
-
-        BigDecimal nominal = BigDecimal.valueOf(amount);
-        BalanceTransaction balanceTransaction = BalanceTransaction.builder()
-                .nominal(nominal)
-                .status(BalanceTransactionStatus.DEDUCTED.getValue())
-                .transactionType(BalanceTransactionType.PAYPAL.getValue())
-                .user(user)
-                .build();
-
-        UserEntity tobeUpdateUser = userRepository.findById(user.getId()).orElseThrow(() -> new RuntimeException("User Not Found"));
-
-        tobeUpdateUser.setBalance(tobeUpdateUser.getBalance().subtract(nominal));
-
-        balanceTransactionRepository.saveAndFlush(balanceTransaction);
-        userRepository.saveAndFlush(tobeUpdateUser);
+        try{
+            payout.create(apiContext, null);
+        } catch (PayPalRESTException e){
+            throw new RuntimeException(e.getMessage());
+        }
 
         log.info("Payout executed");
         return DataResponse.builder()
