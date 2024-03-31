@@ -32,8 +32,14 @@ public class ArticleEntity {
     @JoinColumn(name = "user_id", updatable = false)
     private UserEntity user;
 
+    @Column(name = "title")
+    private String title;
+
     @Column(name = "post")
     private String post;
+
+    @Column(name = "image")
+    private byte[] image;
 
     @CreatedDate
     @Column(name = "created_time")

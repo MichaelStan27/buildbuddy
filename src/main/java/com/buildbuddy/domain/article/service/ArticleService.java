@@ -6,6 +6,7 @@ import com.buildbuddy.domain.article.dto.request.ArticleRequestDto;
 import com.buildbuddy.domain.article.dto.response.article.ArticleResponseDto;
 import com.buildbuddy.domain.article.dto.response.article.ArticleResponseSchema;
 import com.buildbuddy.domain.article.entity.ArticleEntity;
+import com.buildbuddy.domain.article.entity.ArticleModel;
 import com.buildbuddy.domain.article.repository.ArticleRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
@@ -23,6 +24,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -44,18 +46,19 @@ public class ArticleService {
     @Transactional
     public DataResponse<ArticleResponseSchema> get(ArticleRequestParam requestParam) {
 
+        String search = requestParam.getSearch() != null ? "%" + requestParam.getSearch().toUpperCase() + "%" : null;
         boolean isPaginated = requestParam.isPagination();
         Integer pageNo = requestParam.getPageNo();
         Integer pageSize = requestParam.getPageSize();
         String sortBy = requestParam.getSortBy();
         String sortDirection = requestParam.getSortDirection();
 
-        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+        Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ArticleEntity> dataPage = getArticleFromDB(requestParam, pageable);
-        List<ArticleEntity> articleList = dataPage.getContent();
+        Page<ArticleModel> dataPage = articleRepository.getByCustomParam(search, pageable);
+        List<ArticleModel> articleList = dataPage.getContent();
 
         List<ArticleResponseDto> articleResponseDtos = articleList.stream()
                 .map(ArticleResponseDto::convertToDto)
@@ -76,20 +79,6 @@ public class ArticleService {
                 .data(data)
                 .build();
     }
-
-    private Page<ArticleEntity> getArticleFromDB(ArticleRequestParam param, Pageable pageable){
-        log.info("Getting article from DB...");
-
-        List<ParamFilter> paramFilters = param.getFilters();
-        Page<ArticleEntity> data = null;
-
-        if(paramFilters.isEmpty())
-            data = articleRepository.findAll(pageable);
-        else
-            data = articleRepository.findAll(specificationCreator.getSpecification(paramFilters), pageable);
-
-        return data;
-    }
     
     @Transactional
     public DataResponse<ArticleResponseDto> save(ArticleRequestDto articleDto){
@@ -102,8 +91,14 @@ public class ArticleService {
             UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() -> new BadRequestException("Request not authenticated"));
             log.info("current authenticated user: {}",currentUser.getUsername());
 
+            String title = articleDto.getTitle();
+            String post = articleDto.getPost();
+            String image = articleDto.getImage();
+
             article = articleRepository.findByIdAndUserId(id, currentUser.getId()).orElseThrow(() -> new BadRequestException("Article Not Found"));
-            article.setPost(articleDto.getPost());
+            article.setTitle(title != null ? title : article.getTitle());
+            article.setPost(post != null ? post : article.getPost());
+            article.setImage(image != null ? Base64.getDecoder().decode(articleDto.getImage()) : article.getImage());
         }
         else {
             article = ArticleRequestDto.convertToEntity(articleDto);

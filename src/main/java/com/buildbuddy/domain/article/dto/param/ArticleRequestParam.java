@@ -16,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ArticleRequestParam {
 
+    private String search;
     private List<Integer> articleIdList;
     private List<String> usernameList;
     private String post;

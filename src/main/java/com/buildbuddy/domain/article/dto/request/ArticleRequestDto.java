@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -14,11 +16,18 @@ public class ArticleRequestDto {
 
     private Integer id;
 
-    private  String post;
+    private String title;
+
+    private String post;
+
+    private String image;
 
     public static ArticleEntity convertToEntity(ArticleRequestDto dto){
+        String image = dto.getImage();
         return ArticleEntity.builder()
+                .title(dto.getTitle())
                 .post(dto.getPost())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 
