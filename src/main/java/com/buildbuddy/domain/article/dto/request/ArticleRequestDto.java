@@ -22,11 +22,14 @@ public class ArticleRequestDto {
 
     private String image;
 
+    private String status;
+
     public static ArticleEntity convertToEntity(ArticleRequestDto dto){
         String image = dto.getImage();
         return ArticleEntity.builder()
                 .title(dto.getTitle())
                 .post(dto.getPost())
+                .status(dto.getStatus())
                 .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }

@@ -8,6 +8,7 @@ public interface ArticleModel {
     String getUsername();
     String getTitle();
     String getPost();
+    String getStatus();
     byte[] getImage();
     LocalDateTime getCreatedTime();
     LocalDateTime getLastUpdateTime();

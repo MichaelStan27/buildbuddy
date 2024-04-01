@@ -41,6 +41,9 @@ public class ArticleEntity {
     @Column(name = "image")
     private byte[] image;
 
+    @Column(name = "status")
+    private String status;
+
     @CreatedDate
     @Column(name = "created_time")
     private LocalDateTime createdTime;
