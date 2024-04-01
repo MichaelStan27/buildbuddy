@@ -93,11 +93,14 @@ public class ArticleService {
 
             String title = articleDto.getTitle();
             String post = articleDto.getPost();
+            String status = articleDto.getStatus();
             String image = articleDto.getImage();
 
             article = articleRepository.findByIdAndUserId(id, currentUser.getId()).orElseThrow(() -> new BadRequestException("Article Not Found"));
             article.setTitle(title != null ? title : article.getTitle());
             article.setPost(post != null ? post : article.getPost());
+            article.setStatus((status != null? status : article.getStatus()));
+
             article.setImage(image != null ? Base64.getDecoder().decode(articleDto.getImage()) : article.getImage());
         }
         else {
