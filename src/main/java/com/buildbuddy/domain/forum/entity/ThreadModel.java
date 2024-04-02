@@ -7,6 +7,8 @@ public interface ThreadModel {
     String getPost();
     String getUsername();
     byte[] getUserProfile();
+    Integer getTotalLike();
+    long getIsLikedByUser();
     LocalDateTime getCreatedTime();
     LocalDateTime getLastUpdateTime();
 }

@@ -2,11 +2,14 @@ package com.buildbuddy.domain.forum.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.forum.dto.param.ThreadRequestParam;
+import com.buildbuddy.domain.forum.dto.request.ThreadLikeReqDto;
 import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseSchema;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.buildbuddy.domain.forum.entity.ThreadLikeEntity;
 import com.buildbuddy.domain.forum.entity.ThreadModel;
+import com.buildbuddy.domain.forum.repository.ThreadLikeRepository;
 import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
@@ -30,6 +33,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -42,9 +46,14 @@ public class ThreadService {
     private ThreadRepository threadRepository;
 
     @Autowired
+    private ThreadLikeRepository threadLikeRepository;
+
+    @Autowired
     private PaginationCreator paginationCreator;
 
     public DataResponse<ThreadResponseSchema> get(ThreadRequestParam requestParam){
+
+        UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("User Not Found"));
 
         boolean isPaginated = requestParam.isPagination();
         Integer pageNo = requestParam.getPageNo();
@@ -57,7 +66,7 @@ public class ThreadService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ThreadModel> dataPage = threadRepository.getByCustomParam(requestParam.getThreadId(), search, pageable);
+        Page<ThreadModel> dataPage = threadRepository.getByCustomParam(user.getId(),requestParam.getThreadId(), search, pageable);
         List<ThreadModel> threadList = dataPage.getContent();
 
         List<ThreadResponseDto> threadResponseDtos = threadList.stream()
@@ -129,6 +138,42 @@ public class ThreadService {
                 .httpStatus(HttpStatus.OK)
                 .message("Success deleting thread")
                 .data("Thread with id: " + threadId + " deleted.")
+                .build();
+    }
+
+    @Transactional
+    public DataResponse<Object> like(ThreadLikeReqDto dto){
+
+        UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("User Not Found"));
+
+        String message = "";
+
+        threadRepository.findById(dto.getThreadId()).orElseThrow(() -> new RuntimeException("Thread not found"));
+        Optional<ThreadLikeEntity> threadLikeOpt = threadLikeRepository.findByThreadIdAndUserId(dto.getThreadId(), user.getId());
+
+        if(threadLikeOpt.isPresent()){
+            log.info("Unliking forum");
+
+            threadLikeRepository.delete(threadLikeOpt.get());
+
+            message = "Forum Unliked.";
+        }
+        else{
+            log.info("liking forum");
+            ThreadLikeEntity entity = ThreadLikeEntity.builder()
+                    .threadId(dto.getThreadId())
+                    .userId(user.getId())
+                    .build();
+            threadLikeRepository.saveAndFlush(entity);
+            message = "Forum liked.";
+        }
+
+        log.info("success....");
+
+        return DataResponse.<Object>builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message(message)
                 .build();
     }
 

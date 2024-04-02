@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.forum.controller;
 
 import com.buildbuddy.domain.forum.dto.param.ThreadRequestParam;
+import com.buildbuddy.domain.forum.dto.request.ThreadLikeReqDto;
 import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseSchema;
@@ -49,6 +50,16 @@ public class ThreadController {
         log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
 
         DataResponse<String> response = threadService.delete(threadId);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<Object> likeThread(@RequestBody ThreadLikeReqDto body, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = threadService.like(body);
 
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());
