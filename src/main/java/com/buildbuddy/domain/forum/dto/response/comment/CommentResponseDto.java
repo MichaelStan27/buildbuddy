@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.forum.dto.response.comment;
 
 import com.buildbuddy.domain.forum.entity.CommentEntity;
+import com.buildbuddy.domain.forum.entity.CommentModel;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Data
 @Builder
@@ -16,23 +18,26 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class CommentResponseDto {
 
-    @JsonProperty(value = "commentId")
+    @JsonProperty
     private Integer commentId;
 
-    @JsonProperty(value = "username")
+    @JsonProperty
     private String username;
 
-    @JsonProperty(value = "message")
+    @JsonProperty
+    private String userProfile;
+
+    @JsonProperty
     private String message;
 
-    @JsonProperty(value = "threadId")
+    @JsonProperty
     private Integer threadId;
 
-    @JsonProperty(value = "createdTime")
+    @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
-    @JsonProperty(value = "lastUpdateTime")
+    @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
 
@@ -42,6 +47,19 @@ public class CommentResponseDto {
                 .username(entity.getUser().getUsername())
                 .message(entity.getMessage())
                 .threadId(entity.getThread().getId())
+                .createdTime(entity.getCreatedTime())
+                .lastUpdateTime(entity.getLastUpdateTime())
+                .build();
+    }
+
+    public static CommentResponseDto convertToDto(CommentModel entity){
+        byte[] profile = entity.getUserProfile();
+        return CommentResponseDto.builder()
+                .commentId(entity.getCommentId())
+                .username(entity.getUsername())
+                .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
+                .message(entity.getMessage())
+                .threadId(entity.getThreadId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();

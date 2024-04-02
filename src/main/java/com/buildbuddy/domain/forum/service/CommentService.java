@@ -7,6 +7,7 @@ import com.buildbuddy.domain.forum.dto.request.CommentRequestDto;
 import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseDto;
 import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseSchema;
 import com.buildbuddy.domain.forum.entity.CommentEntity;
+import com.buildbuddy.domain.forum.entity.CommentModel;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
 import com.buildbuddy.domain.forum.repository.CommentRepository;
 import com.buildbuddy.domain.forum.repository.ThreadRepository;
@@ -42,9 +43,6 @@ public class CommentService {
     private ThreadRepository threadRepository;
 
     @Autowired
-    private SpecificationCreator<CommentEntity> specificationCreator;
-
-    @Autowired
     private CommentRepository commentRepository;
 
     @Autowired
@@ -58,13 +56,14 @@ public class CommentService {
         Integer pageSize = requestParam.getPageSize();
         String sortBy = requestParam.getSortBy();
         String sortDirection = requestParam.getSortDirection();
+        String search = requestParam.getSearch() != null ? "%" + requestParam.getSearch() + "%" : null;
 
-        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+        Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<CommentEntity> dataPage = getCommentFromDB(requestParam, pageable);
-        List<CommentEntity> commentList = dataPage.getContent();
+        Page<CommentModel> dataPage = commentRepository.getByCustomParam(search, pageable);
+        List<CommentModel> commentList = dataPage.getContent();
 
         List<CommentResponseDto> dtoList = commentList.stream()
                 .map(CommentResponseDto::convertToDto)
@@ -84,20 +83,6 @@ public class CommentService {
                 .message("Success getting comment")
                 .data(data)
                 .build();
-    }
-
-    private Page<CommentEntity> getCommentFromDB(CommentRequestParam param, Pageable pageable){
-        log.info("Getting comment from DB...");
-
-        List<ParamFilter> paramFilters = param.getFilters();
-        Page<CommentEntity> data = null;
-
-        if(paramFilters.isEmpty())
-            data = commentRepository.findAll(pageable);
-        else
-            data = commentRepository.findAll(specificationCreator.getSpecification(paramFilters), pageable);
-
-        return data;
     }
 
     @Transactional

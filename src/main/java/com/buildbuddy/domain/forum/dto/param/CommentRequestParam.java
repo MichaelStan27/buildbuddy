@@ -17,17 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class CommentRequestParam {
 
-    @JsonProperty(value = "commentIdList")
-    private List<Integer> commentIdList;
-
-    @JsonProperty(value = "threadIdList")
-    private List<Integer> threadIdList;
-
-    @JsonProperty(value = "usernameList")
-    private List<String> usernameList;
-
-    @JsonProperty(value = "message")
-    private String message;
+    private String search;
 
     // Pagination
     @Builder.Default
@@ -44,44 +34,5 @@ public class CommentRequestParam {
 
     @Builder.Default
     private String sortDirection = "asc";
-
-    public List<ParamFilter> getFilters(){
-
-        List<ParamFilter> paramFilters = new ArrayList<>();
-
-        if(commentIdList != null && !commentIdList.isEmpty()){
-            paramFilters.add(ParamFilter.builder()
-                            .field("id")
-                            .operator(QueryOperator.IN)
-                            .values(commentIdList)
-                    .build());
-        }
-
-        if(threadIdList != null && !threadIdList.isEmpty()){
-            paramFilters.add(ParamFilter.builder()
-                            .field("id")
-                            .operator(QueryOperator.THREAD_ID)
-                            .values(threadIdList)
-                    .build());
-        }
-
-        if(usernameList != null && !usernameList.isEmpty()){
-            paramFilters.add(ParamFilter.builder()
-                    .field("username")
-                    .operator(QueryOperator.USERNAME)
-                    .values(usernameList)
-                    .build());
-        }
-
-        if(message != null){
-            paramFilters.add(ParamFilter.builder()
-                    .field("message")
-                    .operator(QueryOperator.LIKE)
-                    .value(message)
-                    .build());
-        }
-
-        return paramFilters;
-    }
 
 }

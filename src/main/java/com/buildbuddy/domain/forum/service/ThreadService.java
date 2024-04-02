@@ -39,9 +39,6 @@ public class ThreadService {
     private AuditorAwareImpl audit;
 
     @Autowired
-    private SpecificationCreator<ThreadEntity> specificationCreator;
-
-    @Autowired
     private ThreadRepository threadRepository;
 
     @Autowired
