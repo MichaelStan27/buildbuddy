@@ -16,9 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class ThreadRequestParam {
 
-    private List<Integer> threadIdList;
-    private List<String> usernameList;
-    private String post;
+    private Integer threadId;
+    private String search;
 
     // Pagination
     @Builder.Default
@@ -35,35 +34,4 @@ public class ThreadRequestParam {
 
     @Builder.Default
     private String sortDirection = "asc";
-
-    public List<ParamFilter> getFilters(){
-
-        List<ParamFilter> paramFilters = new ArrayList<>();
-
-        if(threadIdList != null && !threadIdList.isEmpty()){
-            paramFilters.add(ParamFilter.builder()
-                            .field("id")
-                            .operator(QueryOperator.IN)
-                            .values(threadIdList)
-                    .build());
-        }
-
-        if(usernameList != null && !usernameList.isEmpty()){
-            paramFilters.add(ParamFilter.builder()
-                            .field("username")
-                            .operator(QueryOperator.USERNAME)
-                            .values(usernameList)
-                    .build());
-        }
-
-        if(post != null){
-            paramFilters.add(ParamFilter.builder()
-                            .field("post")
-                            .operator(QueryOperator.LIKE)
-                            .value(post)
-                    .build());
-        }
-
-        return paramFilters;
-    }
 }

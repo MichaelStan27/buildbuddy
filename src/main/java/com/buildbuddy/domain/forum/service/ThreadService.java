@@ -6,6 +6,7 @@ import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseDto;
 import com.buildbuddy.domain.forum.dto.response.thread.ThreadResponseSchema;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
+import com.buildbuddy.domain.forum.entity.ThreadModel;
 import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
@@ -53,13 +54,14 @@ public class ThreadService {
         Integer pageSize = requestParam.getPageSize();
         String sortBy = requestParam.getSortBy();
         String sortDirection = requestParam.getSortDirection();
+        String search = requestParam.getSearch() != null ? "%" + requestParam.getSearch() + "%" : null;
 
-        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+        Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ThreadEntity> dataPage = getThreadFromDB(requestParam, pageable);
-        List<ThreadEntity> threadList = dataPage.getContent();
+        Page<ThreadModel> dataPage = threadRepository.getByCustomParam(requestParam.getThreadId(), search, pageable);
+        List<ThreadModel> threadList = dataPage.getContent();
 
         List<ThreadResponseDto> threadResponseDtos = threadList.stream()
                 .map(ThreadResponseDto::convertToDto)
@@ -79,20 +81,6 @@ public class ThreadService {
                 .message("Success getting thread")
                 .data(data)
                 .build();
-    }
-
-    private Page<ThreadEntity> getThreadFromDB(ThreadRequestParam param, Pageable pageable){
-        log.info("Getting thread from DB...");
-
-        List<ParamFilter> paramFilters = param.getFilters();
-        Page<ThreadEntity> data = null;
-
-        if(paramFilters.isEmpty())
-            data = threadRepository.findAll(pageable);
-        else
-            data = threadRepository.findAll(specificationCreator.getSpecification(paramFilters), pageable);
-
-        return data;
     }
 
     @Transactional
