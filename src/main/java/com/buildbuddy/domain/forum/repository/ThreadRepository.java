@@ -22,7 +22,7 @@ public interface ThreadRepository extends JpaRepository<ThreadEntity, Integer>, 
             "from thread t join user u on t.user_id = u.user_id " +
             "where t.thread_id = (case when :threadId is null then t.thread_id else :threadId end) " +
             "and (u.username like (case when :search is null then u.username else :search end) " +
-            "or t.post like (case when :search is null then t.post else :search end)" +
+            "or t.post like (case when :search is null then t.post else :search end) " +
             ") ")
     Page<ThreadModel> getByCustomParam(@Param("userId") Integer userId,
                                        @Param("threadId") Integer threadId,

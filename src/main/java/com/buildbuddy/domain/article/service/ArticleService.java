@@ -19,6 +19,7 @@ import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -63,22 +64,32 @@ public class ArticleService {
 
         Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
-        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+        Pageable pageable = paginationCreator.createPageable(false, sort, pageNo, pageSize);
 
         Page<ArticleModel> dataPage = articleRepository.getByCustomParam(user.getId(), requestParam.getArticleId(), search, pageable);
         List<ArticleModel> articleList = dataPage.getContent();
 
-        List<ArticleResponseDto> articleResponseDtos = articleList.stream()
-                .map(ArticleResponseDto::convertToDto)
-                .toList();
-
         ArticleResponseSchema data = ArticleResponseSchema.builder()
-                .articleList(articleResponseDtos)
                 .pageNo(pageNo)
                 .pageSize(pageSize)
                 .totalPages(dataPage.getTotalPages())
                 .totalData(dataPage.getTotalElements())
                 .build();
+
+        if(isPaginated){
+            PagedListHolder<ArticleModel> pagedListHolder = new PagedListHolder<>(articleList);
+            pagedListHolder.setPageSize(pageSize);
+            pagedListHolder.setPage(pageNo);
+            articleList = pagedListHolder.getPageList();
+            data.setTotalPages(pagedListHolder.getPageCount());
+            data.setTotalData(pagedListHolder.getNrOfElements());
+        }
+
+        List<ArticleResponseDto> articleResponseDtos = articleList.stream()
+                .map(ArticleResponseDto::convertToDto)
+                .toList();
+
+        data.setArticleList(articleResponseDtos);
 
         return DataResponse.<ArticleResponseSchema>builder()
                 .timestamp(LocalDateTime.now())

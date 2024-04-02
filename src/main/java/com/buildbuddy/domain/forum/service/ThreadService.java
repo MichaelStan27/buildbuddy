@@ -1,6 +1,8 @@
 package com.buildbuddy.domain.forum.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
+import com.buildbuddy.domain.article.dto.response.article.ArticleResponseSchema;
+import com.buildbuddy.domain.article.entity.ArticleModel;
 import com.buildbuddy.domain.forum.dto.param.ThreadRequestParam;
 import com.buildbuddy.domain.forum.dto.request.ThreadLikeReqDto;
 import com.buildbuddy.domain.forum.dto.request.ThreadRequestDto;
@@ -22,6 +24,7 @@ import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -64,22 +67,32 @@ public class ThreadService {
 
         Sort sort = paginationCreator.createAliasesSort(sortDirection, sortBy);
 
-        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+        Pageable pageable = paginationCreator.createPageable(false, sort, pageNo, pageSize);
 
         Page<ThreadModel> dataPage = threadRepository.getByCustomParam(user.getId(),requestParam.getThreadId(), search, pageable);
         List<ThreadModel> threadList = dataPage.getContent();
 
-        List<ThreadResponseDto> threadResponseDtos = threadList.stream()
-                .map(ThreadResponseDto::convertToDto)
-                .toList();
-
         ThreadResponseSchema data = ThreadResponseSchema.builder()
-                .threadList(threadResponseDtos)
                 .pageNo(pageNo)
                 .pageSize(pageSize)
                 .totalPages(dataPage.getTotalPages())
                 .totalData(dataPage.getTotalElements())
                 .build();
+
+        if(isPaginated){
+            PagedListHolder<ThreadModel> pagedListHolder = new PagedListHolder<>(threadList);
+            pagedListHolder.setPageSize(pageSize);
+            pagedListHolder.setPage(pageNo);
+            threadList = pagedListHolder.getPageList();
+            data.setTotalPages(pagedListHolder.getPageCount());
+            data.setTotalData(pagedListHolder.getNrOfElements());
+        }
+
+        List<ThreadResponseDto> threadResponseDtos = threadList.stream()
+                .map(ThreadResponseDto::convertToDto)
+                .toList();
+
+        data.setThreadList(threadResponseDtos);
 
         return DataResponse.<ThreadResponseSchema>builder()
                 .timestamp(LocalDateTime.now())
