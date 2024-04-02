@@ -57,7 +57,7 @@ public class ArticleService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<ArticleModel> dataPage = articleRepository.getByCustomParam(search, pageable);
+        Page<ArticleModel> dataPage = articleRepository.getByCustomParam(requestParam.getArticleId(), search, pageable);
         List<ArticleModel> articleList = dataPage.getContent();
 
         List<ArticleResponseDto> articleResponseDtos = articleList.stream()
