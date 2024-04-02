@@ -37,6 +37,12 @@ public class ArticleResponseDto {
     private String username;
 
     @JsonProperty
+    private Integer totalLike;
+
+    @JsonProperty
+    private Boolean isLikedByUser;
+
+    @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
@@ -52,6 +58,8 @@ public class ArticleResponseDto {
                 .post(entity.getPost())
                 .status(entity.getStatus())
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
+                .totalLike(0)
+                .isLikedByUser(false)
                 .username(entity.getUser().getUsername())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
@@ -67,6 +75,8 @@ public class ArticleResponseDto {
                 .status(entity.getStatus())
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .username(entity.getUsername())
+                .totalLike(entity.getTotalLike())
+                .isLikedByUser(entity.getIsLikedByUser() != 0)
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();

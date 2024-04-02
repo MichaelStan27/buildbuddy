@@ -10,6 +10,8 @@ public interface ArticleModel {
     String getPost();
     String getStatus();
     byte[] getImage();
+    Integer getTotalLike();
+    long getIsLikedByUser();
     LocalDateTime getCreatedTime();
     LocalDateTime getLastUpdateTime();
 

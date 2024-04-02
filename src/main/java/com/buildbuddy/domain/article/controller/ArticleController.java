@@ -1,6 +1,7 @@
 package com.buildbuddy.domain.article.controller;
 
 import com.buildbuddy.domain.article.dto.param.ArticleRequestParam;
+import com.buildbuddy.domain.article.dto.request.ArticleLikeDto;
 import com.buildbuddy.domain.article.dto.request.ArticleRequestDto;
 import com.buildbuddy.domain.article.dto.response.article.ArticleResponseDto;
 import com.buildbuddy.domain.article.dto.response.article.ArticleResponseSchema;
@@ -52,5 +53,16 @@ public class ArticleController {
         log.info("Success Executing Request on {}", request.getServletPath());
         return new ResponseEntity<>(response, response.getHttpStatus());
     }
+
+    @PostMapping("/like")
+    public ResponseEntity<Object> like(@RequestBody ArticleLikeDto body, HttpServletRequest request){
+        log.info("Received Request on {} - {}", request.getServletPath(), request.getMethod());
+
+        DataResponse<Object> response = articleService.like(body);
+
+        log.info("Success Executing Request on {}", request.getServletPath());
+        return new ResponseEntity<>(response, response.getHttpStatus());
+    }
+
 
 }
