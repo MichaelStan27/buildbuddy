@@ -76,7 +76,7 @@ public class ArticleResponseDto {
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .username(entity.getUsername())
                 .totalLike(entity.getTotalLike())
-//                .isLikedByUser(entity.getIsLikedByUser() != 0)
+                .isLikedByUser(entity.getIsLikedByUser() != 0)
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();
