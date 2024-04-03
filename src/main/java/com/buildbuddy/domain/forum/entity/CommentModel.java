@@ -8,6 +8,8 @@ public interface CommentModel {
 
     String getUsername();
 
+    Integer getUserId();
+
     byte[] getUserProfile();
 
     String getMessage();

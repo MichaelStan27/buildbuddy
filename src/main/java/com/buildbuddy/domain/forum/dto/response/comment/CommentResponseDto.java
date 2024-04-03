@@ -61,6 +61,7 @@ public class CommentResponseDto {
         return CommentResponseDto.builder()
                 .commentId(entity.getCommentId())
                 .username(entity.getUsername())
+                .userId(entity.getUserId())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .message(entity.getMessage())
                 .threadId(entity.getThreadId())

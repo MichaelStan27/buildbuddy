@@ -64,6 +64,7 @@ public class ThreadResponseDto {
                 .threadId(entity.getThreadId())
                 .post(entity.getPost())
                 .username(entity.getUsername())
+                .userId(entity.getUserId())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
