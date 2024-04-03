@@ -1,25 +1,17 @@
-package com.buildbuddy.domain.forum.dto.param;
+package com.buildbuddy.domain.consult.dto.param;
 
-import com.buildbuddy.util.spesification.ParamFilter;
-import com.buildbuddy.util.spesification.QueryOperator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentRequestParam {
+public class ConsultantRequestReqParam {
 
     private String search;
-
-    private Integer threadId;
 
     // Pagination
     @Builder.Default
@@ -32,9 +24,8 @@ public class CommentRequestParam {
     private Integer pageSize = 10;
 
     @Builder.Default
-    private String sortBy = "lastUpdateTime";
+    private String sortBy = "created_time";
 
     @Builder.Default
-    private String sortDirection = "asc";
-
+    private String sortDirection = "desc";
 }

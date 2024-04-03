@@ -2,6 +2,8 @@ package com.buildbuddy.domain.user.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.consult.entity.ConsultantDetail;
+import com.buildbuddy.domain.consult.entity.ConsultantRequest;
+import com.buildbuddy.domain.consult.repository.ConsultantRequestRepository;
 import com.buildbuddy.domain.user.dto.BalanceTransactionReqParam;
 import com.buildbuddy.domain.user.dto.request.UserRequestDto;
 import com.buildbuddy.domain.user.dto.response.BalanceTransDto;
@@ -12,6 +14,7 @@ import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
 import com.buildbuddy.enums.UserRole;
+import com.buildbuddy.enums.consultrequest.ConsultantRequestStatus;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
 import com.paypal.base.codec.binary.Base64;
@@ -54,6 +57,9 @@ public class UserService {
     @Autowired
     private PaginationCreator paginationCreator;
 
+    @Autowired
+    private ConsultantRequestRepository consultantRequestRepository;
+
     public DataResponse<UserResponseDto> getUserByUsername(String username){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User userDetails = (User) authentication.getPrincipal();
@@ -91,7 +97,7 @@ public class UserService {
     public DataResponse<UserResponseDto> save(UserRequestDto userDto){
 
         UserEntity user = null;
-
+        ConsultantRequest consultantRequest = null;
         if(userDto.getUserId() == null){
             log.info("Creating user");
             String role = userDto.getRole();
@@ -100,18 +106,25 @@ public class UserService {
                 throw new RuntimeException("role is not valid");
             String pass = passwordEncoder.encode(userDto.getPassword());
 
-            user = UserEntity.builder()
-                    .username(userDto.getUsername())
-                    .email(userDto.getEmail())
-                    .password(pass)
-                    .role(role)
-                    .age(userDto.getAge())
-                    .gender(userDto.getGender())
-                    .balance(BigDecimal.ZERO)
-                    .createdTime(LocalDateTime.now())
-                    .build();
-
             if(role.equals(UserRole.CONSULTANT.getValue())){
+                consultantRequest = consultantRequestRepository.findByUsername(userDto.getUsername()).orElseThrow(() -> new RuntimeException("username is not registered in consultant appliance"));
+                if(consultantRequest.getUserId() != null)
+                    throw new RuntimeException("username is already registered in appliance consultant and created an account");
+
+                if(!consultantRequest.getStatus().equals(ConsultantRequestStatus.APPROVED.getValue()))
+                    throw new RuntimeException("cant create account, status appliance: " + consultantRequest.getStatus());
+
+                user = UserEntity.builder()
+                        .username(consultantRequest.getUsername())
+                        .email(consultantRequest.getEmail())
+                        .password(pass)
+                        .role(role)
+                        .age(consultantRequest.getAge())
+                        .gender(consultantRequest.getGender())
+                        .balance(BigDecimal.ZERO)
+                        .createdTime(LocalDateTime.now())
+                        .build();
+
                 log.info("creating consultant detail");
                 ConsultantDetail consultantDetail = ConsultantDetail.builder()
                         .user(user)
@@ -121,6 +134,18 @@ public class UserService {
                         .build();
                 user.setConsultantDetail(consultantDetail);
             }
+            else{
+                user = UserEntity.builder()
+                        .username(userDto.getUsername())
+                        .email(userDto.getEmail())
+                        .password(pass)
+                        .role(role)
+                        .age(userDto.getAge())
+                        .gender(userDto.getGender())
+                        .balance(BigDecimal.ZERO)
+                        .createdTime(LocalDateTime.now())
+                        .build();
+            }
         }
         else {
             log.info("Updating user");
@@ -129,6 +154,10 @@ public class UserService {
         }
 
         user = userRepository.saveAndFlush(user);
+        if(consultantRequest != null){
+            consultantRequest.setUserId(user.getId());
+            consultantRequestRepository.saveAndFlush(consultantRequest);
+        }
 
         UserResponseDto data = UserResponseDto.convertToDto(user);
 

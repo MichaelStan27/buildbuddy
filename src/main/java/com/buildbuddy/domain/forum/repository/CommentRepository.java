@@ -18,8 +18,10 @@ public interface CommentRepository extends JpaRepository<CommentEntity, Integer>
 
     @Query(nativeQuery = true, value = "select c.comment_id as commentId, u.username as username, u.user_id as userId, u.profile_picture as userProfile, c.message as message, c.thread_id as threadId, c.created_time as createdTime, c.last_update_time as lastUpdateTime " +
             "from comment c join user u on c.user_id = u.user_id " +
-            "where u.username like (case when :search is null then u.username else :search end) " +
-            "or c.message like (case when :search is null then c.message else :search end)")
-    Page<CommentModel> getByCustomParam(@Param("search") String search, Pageable pageable);
+            "where c.thread_id = (case when :threadId is null then c.thread_id else :threadId end) " +
+            "and (u.username like (case when :search is null then u.username else :search end) " +
+            "or c.message like (case when :search is null then c.message else :search end)" +
+            ")")
+    Page<CommentModel> getByCustomParam(@Param("threadId") Integer threadId, @Param("search") String search, Pageable pageable);
 
 }

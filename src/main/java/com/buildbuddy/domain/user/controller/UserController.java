@@ -22,7 +22,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-//    @PreAuthorize("hasAuthority('admin')")
     @GetMapping(value = "/get-by-username")
     public ResponseEntity<Object> getUserByUsername(@RequestParam String username,
                                             HttpServletRequest request){
