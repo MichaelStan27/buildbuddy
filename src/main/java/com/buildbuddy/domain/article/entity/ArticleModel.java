@@ -6,6 +6,7 @@ public interface ArticleModel {
 
     Integer getArticleId();
     String getUsername();
+    Integer getUserId();
     String getTitle();
     String getPost();
     String getStatus();
