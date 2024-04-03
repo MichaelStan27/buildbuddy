@@ -38,11 +38,11 @@ public class ConsultRequestService {
         if(dto.getUsername() == null || dto.getEmail() == null)
             throw new RuntimeException("Must Fill Username and Email");
 
-        Optional<String> username = consultantRequestRepository.findByUsername(dto.getUsername());
+        Optional<String> username = consultantRequestRepository.getByUsername(dto.getUsername());
         if(username.isPresent())
             throw new RuntimeException("Username is already taken, please choose another one");
 
-        Optional<String> email = consultantRequestRepository.findByEmail(dto.getEmail());
+        Optional<String> email = consultantRequestRepository.getByEmail(dto.getEmail());
         if(email.isPresent())
             throw new RuntimeException("Email is already taken, please choose another one");
 

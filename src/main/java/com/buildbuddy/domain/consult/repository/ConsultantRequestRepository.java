@@ -16,7 +16,7 @@ public interface ConsultantRequestRepository extends JpaRepository<ConsultantReq
             "    SELECT username FROM user " +
             ") AS combined_tables " +
             "WHERE username = :username")
-    Optional<String> findByUsername(@Param("username") String username);
+    Optional<String> getByUsername(@Param("username") String username);
 
     @Query(nativeQuery = true, value = "SELECT email " +
             "FROM ( " +
@@ -25,5 +25,7 @@ public interface ConsultantRequestRepository extends JpaRepository<ConsultantReq
             "    SELECT email FROM user " +
             ") AS combined_tables " +
             "WHERE email = :email")
-    Optional<String> findByEmail(@Param("email") String email);
+    Optional<String> getByEmail(@Param("email") String email);
+
+    Optional<ConsultantRequest> findByUsername(String username);
 }
