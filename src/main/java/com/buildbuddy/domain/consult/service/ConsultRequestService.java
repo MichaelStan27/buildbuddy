@@ -2,21 +2,29 @@ package com.buildbuddy.domain.consult.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
 import com.buildbuddy.domain.consult.dto.EmailDto;
+import com.buildbuddy.domain.consult.dto.param.ConsultantRequestReqParam;
 import com.buildbuddy.domain.consult.dto.request.ConsultantRequestDto;
+import com.buildbuddy.domain.consult.dto.response.ConsultantRequestResDto;
+import com.buildbuddy.domain.consult.dto.response.ConsultantRequestSchema;
 import com.buildbuddy.domain.consult.entity.ConsultantRequest;
 import com.buildbuddy.domain.consult.repository.ConsultantRequestRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.enums.consultrequest.ConsultantRequestStatus;
 import com.buildbuddy.jsonresponse.DataResponse;
+import com.buildbuddy.util.PaginationCreator;
 import jakarta.mail.MessagingException;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -31,6 +39,9 @@ public class ConsultRequestService {
 
     @Autowired
     private ConsultantRequestRepository consultantRequestRepository;
+
+    @Autowired
+    private PaginationCreator paginationCreator;
 
     @Transactional
     public DataResponse<Object> create(ConsultantRequestDto dto){
@@ -87,6 +98,10 @@ public class ConsultRequestService {
                 .body("Your Appliance For Consultant is " + approval + " by admin")
                 .build();
 
+        if(approval.equals(ConsultantRequestStatus.APPROVED.getValue()))
+            message = "request approved";
+        else
+            message = "request rejected";
         try {
             emailService.sendEmail(emailDto);
         } catch (MessagingException | IOException e) {
@@ -100,5 +115,44 @@ public class ConsultRequestService {
                 .build();
     }
 
+
+    public DataResponse<Object> get(ConsultantRequestReqParam param){
+
+        log.info("Getting transaction by: {}", param);
+
+        boolean isPaginated = param.isPagination();
+        Integer pageNo = param.getPageNo();
+        Integer pageSize = param.getPageSize();
+        String sortBy = param.getSortBy();
+        String sortDirection = param.getSortDirection();
+
+        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
+
+        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
+
+        String search = param.getSearch() != null ? "%" + param.getSearch() + "%" : null;
+
+        Page<ConsultantRequest> dataPage = consultantRequestRepository.getByCustomParam(search, pageable);
+        List<ConsultantRequest> requestList = dataPage.getContent();
+
+        List<ConsultantRequestResDto> dtoList = requestList.stream()
+                .map(ConsultantRequestResDto::convertToDto)
+                .toList();
+
+        ConsultantRequestSchema data = ConsultantRequestSchema.builder()
+                .requestList(dtoList)
+                .totalData(dataPage.getTotalElements())
+                .totalPages(dataPage.getTotalPages())
+                .pageNo(pageNo)
+                .pageSize(pageSize)
+                .build();
+
+        return DataResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .httpStatus(HttpStatus.OK)
+                .message("success getting consultant request")
+                .data(data)
+                .build();
+    }
 
 }

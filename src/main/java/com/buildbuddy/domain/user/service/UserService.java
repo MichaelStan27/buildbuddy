@@ -14,6 +14,7 @@ import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.domain.user.repository.BalanceTransactionRepository;
 import com.buildbuddy.domain.user.repository.UserRepository;
 import com.buildbuddy.enums.UserRole;
+import com.buildbuddy.enums.consultrequest.ConsultantRequestStatus;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
 import com.paypal.base.codec.binary.Base64;
@@ -109,6 +110,9 @@ public class UserService {
                 consultantRequest = consultantRequestRepository.findByUsername(userDto.getUsername()).orElseThrow(() -> new RuntimeException("username is not registered in consultant appliance"));
                 if(consultantRequest.getUserId() != null)
                     throw new RuntimeException("username is already registered in appliance consultant and created an account");
+
+                if(!consultantRequest.getStatus().equals(ConsultantRequestStatus.APPROVED.getValue()))
+                    throw new RuntimeException("cant create account, status appliance: " + consultantRequest.getStatus());
 
                 user = UserEntity.builder()
                         .username(consultantRequest.getUsername())
