@@ -47,7 +47,7 @@ public class EmailService {
 
         helper.addTo(emailDto.getTo());
 
-        helper.setSubject("Consultation Notification");
+        helper.setSubject("Build Buddy Notification");
         htmlTemplate = htmlTemplate.replace("${body}", emailDto.getBody());
 
         helper.setText(htmlTemplate, true);
@@ -55,17 +55,5 @@ public class EmailService {
         log.info("Email Builded");
         javaMailSender.send(message);
         log.info("Email has been sent from server {}:{} to email: {}", host, port, emailDto.getTo());
-    }
-
-    private String readHtmlTemplate() {
-        ClassLoader classLoader = getClass().getClassLoader();
-        try(InputStream inputStream = classLoader.getResourceAsStream("templates/mail-template.html")){
-            if(inputStream != null){
-                return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-            }
-        } catch (IOException e){
-            throw new RuntimeException("Error when trying to read email template", e);
-        }
-        throw new IllegalArgumentException("file not found!");
     }
 }
