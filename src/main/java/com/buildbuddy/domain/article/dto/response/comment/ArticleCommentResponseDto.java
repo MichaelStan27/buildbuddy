@@ -1,7 +1,8 @@
-package com.buildbuddy.domain.forum.dto.response.comment;
+package com.buildbuddy.domain.article.dto.response.comment;
 
-import com.buildbuddy.domain.forum.entity.CommentEntity;
-import com.buildbuddy.domain.forum.entity.CommentModel;
+import com.buildbuddy.domain.article.entity.ArticleCommentEntity;
+import com.buildbuddy.domain.article.entity.ArticleCommentModel;
+import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseDto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -16,7 +17,7 @@ import java.util.Base64;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentResponseDto {
+public class ArticleCommentResponseDto {
 
     @JsonProperty
     private Integer commentId;
@@ -31,7 +32,7 @@ public class CommentResponseDto {
     private String message;
 
     @JsonProperty
-    private Integer threadId;
+    private Integer articleId;
 
     @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -41,27 +42,27 @@ public class CommentResponseDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
 
-    public static CommentResponseDto convertToDto(CommentEntity entity){
+    public static ArticleCommentResponseDto convertToDto(ArticleCommentEntity entity){
         byte[] profile = entity.getUser().getProfilePicture();
-        return CommentResponseDto.builder()
+        return ArticleCommentResponseDto.builder()
                 .commentId(entity.getId())
                 .username(entity.getUser().getUsername())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .message(entity.getMessage())
-                .threadId(entity.getThread().getId())
+                .articleId(entity.getArticle().getId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();
     }
 
-    public static CommentResponseDto convertToDto(CommentModel entity){
+    public static ArticleCommentResponseDto convertToDto(ArticleCommentModel entity){
         byte[] profile = entity.getUserProfile();
-        return CommentResponseDto.builder()
+        return ArticleCommentResponseDto.builder()
                 .commentId(entity.getCommentId())
                 .username(entity.getUsername())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .message(entity.getMessage())
-                .threadId(entity.getThreadId())
+                .articleId(entity.getArticleId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();

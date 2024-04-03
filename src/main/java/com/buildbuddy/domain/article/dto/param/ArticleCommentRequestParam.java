@@ -1,25 +1,19 @@
-package com.buildbuddy.domain.forum.dto.param;
+package com.buildbuddy.domain.article.dto.param;
 
-import com.buildbuddy.util.spesification.ParamFilter;
-import com.buildbuddy.util.spesification.QueryOperator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CommentRequestParam {
+public class ArticleCommentRequestParam {
 
     private String search;
 
-    private Integer threadId;
+    private Integer articleId;
 
     // Pagination
     @Builder.Default

@@ -1,54 +1,53 @@
-package com.buildbuddy.domain.forum.service;
+package com.buildbuddy.domain.article.service;
 
 import com.buildbuddy.audit.AuditorAwareImpl;
-import com.buildbuddy.domain.forum.dto.param.CommentRequestParam;
-import com.buildbuddy.domain.forum.dto.param.ThreadRequestParam;
+import com.buildbuddy.domain.article.dto.param.ArticleCommentRequestParam;
+import com.buildbuddy.domain.article.dto.request.ArticleCommentRequestDto;
+import com.buildbuddy.domain.article.dto.response.comment.ArticleCommentResponseDto;
+import com.buildbuddy.domain.article.dto.response.comment.ArticleCommentSchema;
+import com.buildbuddy.domain.article.entity.ArticleCommentEntity;
+import com.buildbuddy.domain.article.entity.ArticleCommentModel;
+import com.buildbuddy.domain.article.entity.ArticleEntity;
+import com.buildbuddy.domain.article.repository.ArticleCommentRepository;
+import com.buildbuddy.domain.article.repository.ArticleRepository;
 import com.buildbuddy.domain.forum.dto.request.CommentRequestDto;
 import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseDto;
-import com.buildbuddy.domain.forum.dto.response.comment.CommentResponseSchema;
 import com.buildbuddy.domain.forum.entity.CommentEntity;
-import com.buildbuddy.domain.forum.entity.CommentModel;
 import com.buildbuddy.domain.forum.entity.ThreadEntity;
-import com.buildbuddy.domain.forum.repository.CommentRepository;
-import com.buildbuddy.domain.forum.repository.ThreadRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
 import com.buildbuddy.jsonresponse.DataResponse;
 import com.buildbuddy.util.PaginationCreator;
-import com.buildbuddy.util.spesification.ParamFilter;
-import com.buildbuddy.util.spesification.SpecificationCreator;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class CommentService {
+public class ArticleCommentService {
 
     @Autowired
     private AuditorAwareImpl audit;
 
     @Autowired
-    private ThreadRepository threadRepository;
+    private ArticleCommentRepository articleCommentRepository;
 
     @Autowired
-    private CommentRepository commentRepository;
+    private ArticleRepository articleRepository;
+
 
     @Autowired
     private PaginationCreator paginationCreator;
 
-    public DataResponse<CommentResponseSchema> get(CommentRequestParam requestParam){
+    public DataResponse<Object> get(ArticleCommentRequestParam requestParam){
         log.info("param: {}", requestParam);
 
         boolean isPaginated = requestParam.isPagination();
@@ -62,14 +61,14 @@ public class CommentService {
 
         Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
 
-        Page<CommentModel> dataPage = commentRepository.getByCustomParam(requestParam.getThreadId(), search, pageable);
-        List<CommentModel> commentList = dataPage.getContent();
+        Page<ArticleCommentModel> dataPage = articleCommentRepository.getByCustomParam(requestParam.getArticleId(), search, pageable);
+        List<ArticleCommentModel> commentList = dataPage.getContent();
 
-        List<CommentResponseDto> dtoList = commentList.stream()
-                .map(CommentResponseDto::convertToDto)
+        List<ArticleCommentResponseDto> dtoList = commentList.stream()
+                .map(ArticleCommentResponseDto::convertToDto)
                 .toList();
 
-        CommentResponseSchema data = CommentResponseSchema.builder()
+        ArticleCommentSchema data = ArticleCommentSchema.builder()
                 .commentList(dtoList)
                 .pageNo(pageNo)
                 .pageSize(pageSize)
@@ -77,7 +76,7 @@ public class CommentService {
                 .totalData(dataPage.getTotalElements())
                 .build();
 
-        return DataResponse.<CommentResponseSchema>builder()
+        return DataResponse.<Object>builder()
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .message("Success getting comment")
@@ -86,29 +85,29 @@ public class CommentService {
     }
 
     @Transactional
-    public DataResponse<CommentResponseDto> save(CommentRequestDto dto){
+    public DataResponse<Object> save(ArticleCommentRequestDto dto){
         log.info("comment: {}", dto);
 
-        ThreadEntity thread = threadRepository.findById(dto.getThreadId()).orElseThrow(() -> new BadRequestException("thread not found"));
-        CommentEntity comment = null;
+        ArticleEntity article = articleRepository.findById(dto.getArticleId()).orElseThrow(() -> new BadRequestException("article not found"));
+        ArticleCommentEntity comment = null;
 
         if(dto.getCommentId() != null){
             UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() -> new BadRequestException("Request not authenticated"));
             log.info("authenticated user: {}", currentUser.getUsername());
-            comment = commentRepository.findByIdAndUserIdAndThreadId(dto.getCommentId(), currentUser.getId(), thread.getId()).orElseThrow(() -> new BadRequestException("Comment Not Found"));
+            comment = articleCommentRepository.findByIdAndUserIdAndArticleId(dto.getCommentId(), currentUser.getId(), article.getId()).orElseThrow(() -> new BadRequestException("Comment Not Found"));
             comment.setMessage(dto.getMessage());
         }
         else{
-            comment = CommentRequestDto.convertToEntity(dto, thread);
+            comment = ArticleCommentRequestDto.convertToEntity(dto, article);
         }
 
         log.info("saving...");
-        comment = commentRepository.saveAndFlush(comment);
+        comment = articleCommentRepository.saveAndFlush(comment);
         log.info("saved.");
 
-        CommentResponseDto data = CommentResponseDto.convertToDto(comment);
+        ArticleCommentResponseDto data = ArticleCommentResponseDto.convertToDto(comment);
 
-        return DataResponse.<CommentResponseDto>builder()
+        return DataResponse.<Object>builder()
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .message("Success saving comment")
@@ -117,22 +116,22 @@ public class CommentService {
     }
 
     @Transactional
-    public DataResponse<String> delete(Integer threadId, Integer commentId){
-        log.info("Deleting comment by: comment id: {}, thread id: {}", commentId, threadId);
+    public DataResponse<String> delete(Integer articleId, Integer commentId){
+        log.info("Deleting comment by: comment id: {}, article id: {}", commentId, articleId);
 
         UserEntity currentUser = audit.getCurrentAuditor().orElseThrow(() -> new BadRequestException("Request not authenticated"));
 
-        CommentEntity comment = commentRepository.findByIdAndUserIdAndThreadId(commentId, currentUser.getId(), threadId).orElseThrow(() -> new BadRequestException("Comment Not Found"));
+        ArticleCommentEntity comment = articleCommentRepository.findByIdAndUserIdAndArticleId(commentId, currentUser.getId(), articleId).orElseThrow(() -> new BadRequestException("Comment Not Found"));
 
         log.info("Deleting...");
-        commentRepository.delete(comment);
+        articleCommentRepository.delete(comment);
         log.info("Deleted.");
 
         return DataResponse.<String>builder()
                 .httpStatus(HttpStatus.OK)
                 .timestamp(LocalDateTime.now())
                 .message("Success Deleting Comment")
-                .data("Comment with id: " + commentId + " at thread id: " + threadId + " deleted.")
+                .data("Comment with id: " + commentId + " at thread id: " + articleId + " deleted.")
                 .build();
     }
 
