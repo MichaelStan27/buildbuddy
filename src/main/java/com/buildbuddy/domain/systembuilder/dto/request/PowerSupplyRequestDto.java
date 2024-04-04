@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -21,8 +23,10 @@ public class PowerSupplyRequestDto {
     private String color;
     private String formFactor;
     private String efficiency;
+    private String image;
 
     public static PowerSupplyEntity convertToEntity(PowerSupplyRequestDto dto){
+        String image = dto.getImage();
         return PowerSupplyEntity.builder()
                 .name(dto.getName())
                 .manufacturer(dto.getManufacturer())
@@ -32,6 +36,7 @@ public class PowerSupplyRequestDto {
                 .color(dto.getColor())
                 .formFactor(dto.getFormFactor())
                 .efficiency(dto.getEfficiency())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 

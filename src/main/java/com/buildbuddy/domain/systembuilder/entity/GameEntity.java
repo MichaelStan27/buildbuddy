@@ -61,4 +61,7 @@ public class GameEntity {
     @Column(name = "last_update_time")
     private LocalDateTime lastUpdateTime;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }

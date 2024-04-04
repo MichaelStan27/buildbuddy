@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -116,6 +117,7 @@ public class MonitorService {
             monitor.setResponseTime(monitorDto.getResponseTime());
             monitor.setRefreshRate(monitorDto.getRefreshRate());
             monitor.setScreenSize(monitorDto.getScreenSize());
+            monitor.setImage(monitorDto.getImage() != null ? Base64.getDecoder().decode(monitorDto.getImage()) : null);
 
         }
         else{

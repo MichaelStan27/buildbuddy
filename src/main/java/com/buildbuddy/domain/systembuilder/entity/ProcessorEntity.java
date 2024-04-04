@@ -51,4 +51,7 @@ public class ProcessorEntity {
     @Column(name = "benchmark")
     private Integer benchmark;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -46,7 +48,11 @@ public class StorageResponseDto {
     @JsonProperty(value = "cache_memory")
     private String cacheMemory;
 
+    @JsonProperty
+    private String image;
+
     public static StorageResponseDto convertToDto(StorageEntity entity){
+        byte[] image = entity.getImage();
         return StorageResponseDto.builder()
                 .storageId(entity.getId())
                 .name(entity.getName())
@@ -59,6 +65,7 @@ public class StorageResponseDto {
                 .rpm(entity.getRpm())
                 .storageInterface(entity.getStorageInterface())
                 .cacheMemory(entity.getCacheMemory())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

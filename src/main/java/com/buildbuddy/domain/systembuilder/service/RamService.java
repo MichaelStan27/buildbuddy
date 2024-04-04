@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -115,6 +116,7 @@ public class RamService {
             ram.setProductLink(ramDto.getProductLink());
             ram.setRamSpeed(ramDto.getRamSpeed());
             ram.setCasLatency(ramDto.getCasLatency());
+            ram.setImage(ramDto.getImage() != null ? Base64.getDecoder().decode(ramDto.getImage()) : null);
 
         }
         else{

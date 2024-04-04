@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,8 +24,10 @@ public class MotherboardRequestDto {
     private String formFactor;
     private String memorySlots;
     private String maxMemory;
+    private String image;
 
     public static MotherboardEntity convertToEntity(MotherboardRequestDto dto){
+        String image = dto.getImage();
         return MotherboardEntity.builder()
                 .name(dto.getName())
                 .manufacturer(dto.getManufacturer())
@@ -34,6 +38,7 @@ public class MotherboardRequestDto {
                 .formFactor(dto.getFormFactor())
                 .memorySlots(dto.getMemorySlots())
                 .maxMemory(dto.getMaxMemory())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 

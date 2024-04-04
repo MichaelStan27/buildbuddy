@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -46,7 +48,11 @@ public class MonitorResponseDto {
     @JsonProperty(value = "panel_type")
     private String panelType;
 
+    @JsonProperty
+    private String image;
+
     public static MonitorResponseDto convertToDto(MonitorEntity entity){
+        byte[] image = entity.getImage();
         return MonitorResponseDto.builder()
                 .monitorId(entity.getId())
                 .name(entity.getName())
@@ -59,6 +65,7 @@ public class MonitorResponseDto {
                 .responseTime(entity.getResponseTime())
                 .refreshRate(entity.getRefreshRate())
                 .panelType(entity.getPanelType())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

@@ -50,4 +50,7 @@ public class StorageEntity {
 
     @Column(name = "cache_memory")
     private String cacheMemory;
+
+    @Column(name = "image")
+    private byte[] image;
 }

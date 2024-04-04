@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -117,6 +118,7 @@ public class MotherboardService {
             motherboard.setMaxMemory(motherboardDto.getMaxMemory());
             motherboard.setMemorySlots(motherboardDto.getMemorySlots());
             motherboard.setSocketType(motherboardDto.getSocketType());
+            motherboard.setImage(motherboardDto.getImage() != null ? Base64.getDecoder().decode(motherboardDto.getImage()) : null);
 
         }
         else{

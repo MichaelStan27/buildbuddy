@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -113,6 +114,7 @@ public class CaseService {
             computerCase.setCabinetType(caseDto.getCabinetType());
             computerCase.setProductLink(caseDto.getProductLink());
             computerCase.setSidePanel(caseDto.getSidePanel());
+            computerCase.setImage(caseDto.getImage() != null ? Base64.getDecoder().decode(caseDto.getImage()) : null);
 
         }
         else{

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -20,8 +22,10 @@ public class GameRequestDto {
     private Integer cpuBenchmark;
     private String cpu;
     private Integer fileSize;
+    private String image;
 
     public static GameEntity convertToEntity(GameRequestDto dto){
+        String image = dto.getImage();
         return GameEntity.builder()
                 .name(dto.getName())
                 .memory(dto.getMemory())
@@ -30,6 +34,7 @@ public class GameRequestDto {
                 .cpuBenchmark(dto.getCpuBenchmark())
                 .cpu(dto.getCpu())
                 .fileSize(dto.getFileSize())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 

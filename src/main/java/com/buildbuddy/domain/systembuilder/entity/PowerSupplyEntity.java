@@ -45,4 +45,7 @@ public class PowerSupplyEntity {
     @Column(name = "efficiency")
     private String efficiency;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }
