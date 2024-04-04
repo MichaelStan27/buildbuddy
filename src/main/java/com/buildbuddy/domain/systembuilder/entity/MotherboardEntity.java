@@ -47,4 +47,7 @@ public class MotherboardEntity {
 
     @Column(name = "max_memory")
     private String maxMemory;
+
+    @Column(name = "image")
+    private byte[] image;
 }

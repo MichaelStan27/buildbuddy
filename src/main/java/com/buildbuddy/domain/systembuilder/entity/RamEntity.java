@@ -48,4 +48,7 @@ public class RamEntity {
     @Column(name = "cas_latency")
     private String casLatency;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }

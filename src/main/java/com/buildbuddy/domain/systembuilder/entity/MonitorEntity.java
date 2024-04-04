@@ -50,4 +50,7 @@ public class MonitorEntity {
 
     @Column(name = "panel_type")
     private String panelType;
+
+    @Column(name = "image")
+    private byte[] image;
 }

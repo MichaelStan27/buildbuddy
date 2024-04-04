@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -43,7 +45,11 @@ public class RamResponseDto {
     @JsonProperty(value = "cas_latency")
     private String casLatency;
 
+    @JsonProperty
+    private String image;
+
     public static RamResponseDto convertToDto(RamEntity entity){
+        byte[] image = entity.getImage();
         return RamResponseDto.builder()
                 .ramId(entity.getId())
                 .name(entity.getName())
@@ -55,6 +61,7 @@ public class RamResponseDto {
                 .ramSpeed(entity.getRamSpeed())
                 .ramType(entity.getRamType())
                 .casLatency(entity.getCasLatency())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

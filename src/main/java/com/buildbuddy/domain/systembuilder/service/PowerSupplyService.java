@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -114,6 +115,7 @@ public class PowerSupplyService {
             powerSupply.setEfficiency(powerSupplyDto.getEfficiency());
             powerSupply.setProductLink(powerSupplyDto.getProductLink());
             powerSupply.setFormFactor(powerSupplyDto.getFormFactor());
+            powerSupply.setImage(powerSupplyDto.getImage() != null ? Base64.getDecoder().decode(powerSupplyDto.getImage()) : null);
 
         }
         else{

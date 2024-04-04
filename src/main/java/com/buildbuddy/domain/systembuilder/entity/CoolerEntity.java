@@ -39,4 +39,7 @@ public class CoolerEntity {
     @Column(name = "color")
     private String color;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }

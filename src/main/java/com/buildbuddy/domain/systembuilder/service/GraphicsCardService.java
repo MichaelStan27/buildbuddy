@@ -25,6 +25,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -116,7 +117,8 @@ public class GraphicsCardService {
             graphicsCard.setChipset(graphicsCardDto.getChipset());
             graphicsCard.setProductLink(graphicsCardDto.getProductLink());
             graphicsCard.setMemorySize(graphicsCardDto.getMemorySize());
-            graphicsCard.setBenchmark(graphicsCard.getBenchmark());
+            graphicsCard.setBenchmark(graphicsCardDto.getBenchmark());
+            graphicsCard.setImage(graphicsCardDto.getImage() != null ? Base64.getDecoder().decode(graphicsCardDto.getImage()) : null);
 
         }
         else{

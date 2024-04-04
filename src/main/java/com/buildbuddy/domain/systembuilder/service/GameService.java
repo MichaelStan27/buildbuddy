@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -112,6 +113,7 @@ public class GameService {
             game.setCpuBenchmark(gameDto.getCpuBenchmark());
             game.setCpu(gameDto.getCpu());
             game.setFileSize(gameDto.getFileSize());
+            game.setImage(gameDto.getImage() != null ? Base64.getDecoder().decode(gameDto.getImage()) : null);
         }
         else{
             game = GameRequestDto.convertToEntity(gameDto);

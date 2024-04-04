@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -40,7 +42,11 @@ public class GraphicsCardResponseDto {
     @JsonProperty(value = "benchmark")
     private Integer benchmark;
 
+    @JsonProperty
+    private String image;
+
     public static GraphicsCardResponseDto convertToDto(GraphicsCardEntity entity){
+        byte[] image = entity.getImage();
         return GraphicsCardResponseDto.builder()
                 .graphicsId(entity.getId())
                 .name(entity.getName())
@@ -51,6 +57,7 @@ public class GraphicsCardResponseDto {
                 .memorySize(entity.getMemorySize())
                 .graphicsInterface(entity.getGraphicsInterface())
                 .benchmark(entity.getBenchmark())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

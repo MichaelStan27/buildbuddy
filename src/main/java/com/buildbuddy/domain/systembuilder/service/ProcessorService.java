@@ -23,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @Slf4j
@@ -116,7 +117,7 @@ public class ProcessorService {
             processor.setMicroArchitecture(processorDto.getMicroArchitecture());
             processor.setIntegratedGraphics(processorDto.getIntegratedGraphics());
             processor.setBenchmark(processorDto.getBenchmark());
-
+            processor.setImage(processorDto.getImage() != null ? Base64.getDecoder().decode(processorDto.getImage()) : null);
         }
         else{
             processor = ProcessorRequestDto.convertToEntity(processorDto);

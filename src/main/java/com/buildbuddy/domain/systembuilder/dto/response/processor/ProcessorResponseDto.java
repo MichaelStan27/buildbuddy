@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -46,8 +48,11 @@ public class ProcessorResponseDto {
     @JsonProperty(value = "benchmark")
     private Integer benchmark;
 
+    @JsonProperty
+    private String image;
 
     public static ProcessorResponseDto convertToDto(ProcessorEntity entity){
+        byte[] image = entity.getImage();
         return ProcessorResponseDto.builder()
                 .processorId(entity.getId())
                 .name(entity.getName())
@@ -60,6 +65,7 @@ public class ProcessorResponseDto {
                 .integratedGraphics(entity.getIntegratedGraphics())
                 .microArchitecture(entity.getMicroArchitecture())
                 .benchmark(entity.getBenchmark())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

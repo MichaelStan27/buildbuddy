@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -26,7 +28,10 @@ public class CoolerRequestDto {
 
     private String color;
 
+    private String image;
+
     public static CoolerEntity convertToEntity(CoolerRequestDto dto){
+        String image = dto.getImage();
         return CoolerEntity.builder()
                 .name(dto.getName())
                 .manufacturer(dto.getManufacturer())
@@ -34,6 +39,7 @@ public class CoolerRequestDto {
                 .productLink(dto.getProductLink())
                 .coolerType(dto.getCoolerType())
                 .color(dto.getColor())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -23,8 +25,10 @@ public class StorageRequestDto {
     private String rpm;
     private String storageInterface;
     private String cacheMemory;
+    private String image;
 
     public static StorageEntity convertToEntity(StorageRequestDto dto){
+        String image = dto.getImage();
         return StorageEntity.builder()
                 .name(dto.getName())
                 .manufacturer(dto.getManufacturer())
@@ -36,6 +40,7 @@ public class StorageRequestDto {
                 .rpm(dto.getRpm())
                 .storageInterface(dto.getStorageInterface())
                 .cacheMemory(dto.getCacheMemory())
+                .image(image != null ? Base64.getDecoder().decode(image) : null)
                 .build();
     }
 

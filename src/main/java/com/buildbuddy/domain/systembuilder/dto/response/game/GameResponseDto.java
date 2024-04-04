@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Data
 @Builder
@@ -51,7 +52,11 @@ public class GameResponseDto {
     @JsonProperty(value = "lastUpdateTime")
     private LocalDateTime lastUpdateTime;
 
+    @JsonProperty
+    private String image;
+
     public static GameResponseDto convertToDto(GameEntity entity){
+        byte[] image = entity.getImage();
         return GameResponseDto.builder()
                 .gameId(entity.getId())
                 .username(entity.getUser().getUsername())
@@ -63,6 +68,7 @@ public class GameResponseDto {
                 .fileSize(entity.getFileSize())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

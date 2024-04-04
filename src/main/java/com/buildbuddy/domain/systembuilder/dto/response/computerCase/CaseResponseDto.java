@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,7 +39,11 @@ public class CaseResponseDto {
     @JsonProperty(value = "color")
     private String color;
 
+    @JsonProperty
+    private String image;
+
     public static CaseResponseDto convertToDto(CaseEntity entity){
+        byte[] image = entity.getImage();
         return CaseResponseDto.builder()
                 .caseId(entity.getId())
                 .name(entity.getName())
@@ -47,6 +53,7 @@ public class CaseResponseDto {
                 .sidePanel(entity.getSidePanel())
                 .cabinetType(entity.getCabinetType())
                 .color(entity.getColor())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

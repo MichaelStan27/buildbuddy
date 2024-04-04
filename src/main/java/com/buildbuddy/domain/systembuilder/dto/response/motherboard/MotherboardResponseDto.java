@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Base64;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -43,7 +45,11 @@ public class MotherboardResponseDto {
     @JsonProperty(value = "max_memory")
     private String maxMemory;
 
+    @JsonProperty
+    private String image;
+
     public static MotherboardResponseDto convertToDto(MotherboardEntity entity){
+        byte[] image = entity.getImage();
         return MotherboardResponseDto.builder()
                 .motherboardId(entity.getId())
                 .name(entity.getName())
@@ -55,6 +61,7 @@ public class MotherboardResponseDto {
                 .formFactor(entity.getFormFactor())
                 .memorySlots(entity.getMemorySlots())
                 .maxMemory(entity.getMaxMemory())
+                .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }
 

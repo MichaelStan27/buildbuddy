@@ -45,4 +45,7 @@ public class GraphicsCardEntity {
     @Column(name = "benchmark")
     private Integer benchmark;
 
+    @Column(name = "image")
+    private byte[] image;
+
 }
