@@ -13,7 +13,7 @@ public interface ConsultantRequestRepository extends JpaRepository<ConsultantReq
 
     @Query(nativeQuery = true, value = "SELECT username " +
             "FROM ( " +
-            "    SELECT username FROM consultant_request " +
+            "    SELECT username FROM consultant_request WHERE status = 'PENDING' or status = 'APPROVED' " +
             "    UNION " +
             "    SELECT username FROM user " +
             ") AS combined_tables " +
@@ -22,7 +22,7 @@ public interface ConsultantRequestRepository extends JpaRepository<ConsultantReq
 
     @Query(nativeQuery = true, value = "SELECT email " +
             "FROM ( " +
-            "    SELECT email FROM consultant_request " +
+            "    SELECT email FROM consultant_request WHERE status = 'PENDING' or status = 'APPROVED' " +
             "    UNION " +
             "    SELECT email FROM user " +
             ") AS combined_tables " +
