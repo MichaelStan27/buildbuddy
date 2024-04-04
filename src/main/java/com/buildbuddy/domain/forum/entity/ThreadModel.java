@@ -6,6 +6,7 @@ public interface ThreadModel {
     Integer getThreadId();
     String getPost();
     String getUsername();
+    Integer getUserId();
     byte[] getUserProfile();
     Integer getTotalLike();
     long getIsLikedByUser();

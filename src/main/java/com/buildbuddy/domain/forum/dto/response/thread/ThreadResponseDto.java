@@ -37,10 +37,11 @@ public class ThreadResponseDto {
     private Boolean isLikedByUser;
 
     @JsonProperty
+    private Integer userId;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
-    @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lastUpdateTime;
 
@@ -49,6 +50,7 @@ public class ThreadResponseDto {
                 .threadId(entity.getId())
                 .post(entity.getPost())
                 .username(entity.getUser().getUsername())
+                .userId(entity.getUser().getId())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .totalLike(0)
@@ -62,6 +64,7 @@ public class ThreadResponseDto {
                 .threadId(entity.getThreadId())
                 .post(entity.getPost())
                 .username(entity.getUsername())
+                .userId(entity.getUserId())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())

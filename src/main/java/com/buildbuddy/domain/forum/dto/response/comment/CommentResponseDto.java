@@ -25,6 +25,9 @@ public class CommentResponseDto {
     private String username;
 
     @JsonProperty
+    private Integer userId;
+
+    @JsonProperty
     private String userProfile;
 
     @JsonProperty
@@ -46,6 +49,7 @@ public class CommentResponseDto {
         return CommentResponseDto.builder()
                 .commentId(entity.getId())
                 .username(entity.getUser().getUsername())
+                .userId(entity.getUser().getId())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .message(entity.getMessage())
                 .threadId(entity.getThread().getId())
@@ -59,6 +63,7 @@ public class CommentResponseDto {
         return CommentResponseDto.builder()
                 .commentId(entity.getCommentId())
                 .username(entity.getUsername())
+                .userId(entity.getUserId())
                 .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .message(entity.getMessage())
                 .threadId(entity.getThreadId())

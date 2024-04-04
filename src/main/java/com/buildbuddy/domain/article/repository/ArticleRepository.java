@@ -15,7 +15,7 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Integer>
 
         Optional<ArticleEntity> findByIdAndUserId(Integer id, Integer userId);
 
-        @Query(nativeQuery = true, value = "select a.article_id as articleId, u.username as username, a.title as title, " +
+        @Query(nativeQuery = true, value = "select a.article_id as articleId, u.username as username, u.user_id as userId, a.title as title, " +
                 "a.post as post, a.image as image, a.created_time as createdTime, a.last_update_time as lastUpdateTime, " +
                 "(case when exists (select * from article_like where article_id = a.article_id AND user_id = :userId) then true else false end) as isLikedByUser, " +
                 "(select count(*) from article_like where article_id = a.article_id) AS totalLike " +
