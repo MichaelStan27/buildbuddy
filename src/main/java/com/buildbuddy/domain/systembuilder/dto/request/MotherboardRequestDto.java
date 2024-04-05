@@ -25,6 +25,7 @@ public class MotherboardRequestDto {
     private String memorySlots;
     private String maxMemory;
     private String image;
+    private String ramType;
 
     public static MotherboardEntity convertToEntity(MotherboardRequestDto dto){
         String image = dto.getImage();
@@ -39,6 +40,7 @@ public class MotherboardRequestDto {
                 .memorySlots(dto.getMemorySlots())
                 .maxMemory(dto.getMaxMemory())
                 .image(image != null ? Base64.getDecoder().decode(image) : null)
+                .ramType(dto.getRamType())
                 .build();
     }
 

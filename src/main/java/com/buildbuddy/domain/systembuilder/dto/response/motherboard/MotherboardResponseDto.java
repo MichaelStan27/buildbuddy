@@ -48,6 +48,9 @@ public class MotherboardResponseDto {
     @JsonProperty
     private String image;
 
+    @JsonProperty
+    private String ramType;
+
     public static MotherboardResponseDto convertToDto(MotherboardEntity entity){
         byte[] image = entity.getImage();
         return MotherboardResponseDto.builder()
@@ -61,6 +64,7 @@ public class MotherboardResponseDto {
                 .formFactor(entity.getFormFactor())
                 .memorySlots(entity.getMemorySlots())
                 .maxMemory(entity.getMaxMemory())
+                .ramType(entity.getRamType())
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .build();
     }

@@ -118,6 +118,7 @@ public class MotherboardService {
             motherboard.setMaxMemory(motherboardDto.getMaxMemory());
             motherboard.setMemorySlots(motherboardDto.getMemorySlots());
             motherboard.setSocketType(motherboardDto.getSocketType());
+            motherboard.setRamType(motherboardDto.getRamType());
             motherboard.setImage(motherboardDto.getImage() != null ? Base64.getDecoder().decode(motherboardDto.getImage()) : null);
 
         }

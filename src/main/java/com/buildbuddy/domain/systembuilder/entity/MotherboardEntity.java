@@ -50,4 +50,7 @@ public class MotherboardEntity {
 
     @Column(name = "image")
     private byte[] image;
+
+    @Column(name = "ramType")
+    private String ramType;
 }
