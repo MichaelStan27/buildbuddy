@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 
 @Data
@@ -25,7 +26,7 @@ public class MonitorResponseDto {
     private String manufacturer;
 
     @JsonProperty(value = "price")
-    private String price;
+    private BigDecimal price;
 
     @JsonProperty(value = "product_link")
     private String productLink;

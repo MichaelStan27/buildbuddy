@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Builder
@@ -18,7 +20,7 @@ public class GraphicsCardEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "graphics_id")
+    @Column(name = "graphics_card_id")
     private Integer id;
 
     @Column(name = "name")
@@ -28,7 +30,7 @@ public class GraphicsCardEntity {
     private String manufacturer;
 
     @Column(name = "price")
-    private String price;
+    private BigDecimal price;
 
     @Column(name = "product_link")
     private String productLink;
