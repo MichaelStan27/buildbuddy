@@ -26,6 +26,7 @@ public class MotherboardRequestParam {
     private String formFactor;
     private String memorySlots;
     private String maxMemory;
+    private String ramType;
 
     // Pagination
     @Builder.Default
@@ -124,6 +125,14 @@ public class MotherboardRequestParam {
                     .field("maxMemory")
                     .operator(QueryOperator.LIKE)
                     .value(maxMemory)
+                    .build());
+        }
+
+        if (ramType != null) {
+            paramFilters.add(ParamFilter.builder()
+                    .field("ramType")
+                    .operator(QueryOperator.LIKE)
+                    .value(ramType)
                     .build());
         }
 
