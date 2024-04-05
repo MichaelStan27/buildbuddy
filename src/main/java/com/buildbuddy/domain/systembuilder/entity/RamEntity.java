@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Builder
@@ -28,7 +30,7 @@ public class RamEntity {
     private String manufacturer;
 
     @Column(name = "price")
-    private String price;
+    private BigDecimal price;
 
     @Column(name = "product_link")
     private String productLink;

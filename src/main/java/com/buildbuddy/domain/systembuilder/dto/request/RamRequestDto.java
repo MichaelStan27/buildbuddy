@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Base64;
 
 @Data
@@ -17,7 +18,7 @@ public class RamRequestDto {
     private Integer id;
     private String name;
     private String manufacturer;
-    private String price;
+    private BigDecimal price;
     private String productLink;
     private Integer ramSize;
     private Integer ramQuantity;
