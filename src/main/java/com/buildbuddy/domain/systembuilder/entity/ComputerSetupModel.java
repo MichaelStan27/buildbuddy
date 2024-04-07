@@ -2,6 +2,7 @@ package com.buildbuddy.domain.systembuilder.entity;
 
 import jakarta.persistence.Column;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public interface ComputerSetupModel {
@@ -44,6 +45,10 @@ public interface ComputerSetupModel {
     byte[] getStorageImage();
 
     String getUsername();
+
+    BigDecimal getTotalPrice();
+
+    Integer getTotalBenchmark();
 
     LocalDateTime getCreatedTime();
 

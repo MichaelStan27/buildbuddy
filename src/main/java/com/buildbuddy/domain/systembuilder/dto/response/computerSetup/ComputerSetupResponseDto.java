@@ -9,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Base64;
 
@@ -106,6 +107,12 @@ public class ComputerSetupResponseDto {
     private String storageImage;
 
     @JsonProperty
+    private BigDecimal totalPrice;
+
+    @JsonProperty
+    private Integer totalBenchmark;
+
+    @JsonProperty
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdTime;
 
@@ -162,6 +169,8 @@ public class ComputerSetupResponseDto {
                 .storageName(entity.getStorageName())
                 .storageImage(convertByteToImage(entity.getStorageImage()))
                 .username(entity.getUsername())
+                .totalPrice(entity.getTotalPrice())
+                .totalBenchmark(entity.getTotalBenchmark())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .build();
