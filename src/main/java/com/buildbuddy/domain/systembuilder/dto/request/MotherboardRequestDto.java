@@ -23,8 +23,8 @@ public class MotherboardRequestDto {
     private String chipset;
     private String socketType;
     private String formFactor;
-    private String memorySlots;
-    private String maxMemory;
+    private Integer memorySlots;
+    private Integer maxMemory;
     private String image;
     private String ramType;
 

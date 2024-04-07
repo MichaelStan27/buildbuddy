@@ -45,10 +45,10 @@ public class MotherboardEntity {
     private String formFactor;
 
     @Column(name = "memory_slots")
-    private String memorySlots;
+    private Integer memorySlots;
 
     @Column(name = "max_memory")
-    private String maxMemory;
+    private Integer maxMemory;
 
     @Column(name = "image")
     private byte[] image;

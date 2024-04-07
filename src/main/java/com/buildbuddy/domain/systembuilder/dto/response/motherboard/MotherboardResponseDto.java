@@ -41,10 +41,10 @@ public class MotherboardResponseDto {
     private String formFactor;
 
     @JsonProperty(value = "memory_slots")
-    private String memorySlots;
+    private Integer memorySlots;
 
     @JsonProperty(value = "max_memory")
-    private String maxMemory;
+    private Integer maxMemory;
 
     @JsonProperty
     private String image;
