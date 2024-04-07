@@ -24,6 +24,8 @@ public interface ComputerSetupRepository extends JpaRepository<ComputerSetupEnti
             "p.processor_id as processorId, p.name as processorName, p.image as processorImage, " +
             "r.ram_id as ramId, r.name as ramName, r.image as ramImage, " +
             "s.storage_id as storageId, s.name as storageName, s.image as storageImage," +
+            "(cc.price + c.price + gc.price + m.price + mo.price + ps.price + p.price + r.price + s.price) as totalPrice, " +
+            "(gc.benchmark + p.benchmark) as totalBenchmark, " +
             "u.username as username, cs.created_time as createdTime, cs.last_update_time as lastUpdateTime " +
             "from computer_setup cs " +
             "join user u on u.user_id = cs.user_id " +
