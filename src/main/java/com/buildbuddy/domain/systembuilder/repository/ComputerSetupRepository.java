@@ -36,7 +36,8 @@ public interface ComputerSetupRepository extends JpaRepository<ComputerSetupEnti
             "join processor p on p.processor_id = cs.processor_id " +
             "join ram r on r.ram_id = cs.ram_id " +
             "join storage s on s.storage_id = cs.storage_id " +
-            "where cs.computer_setup_id = (case when :computerSetupId is null then cs.computer_setup_id else :computerSetupId end)")
-    List<ComputerSetupModel> getByCustomParam(@Param("computerSetupId") Integer computerSetupId);
+            "where cs.computer_setup_id = (case when :computerSetupId is null then cs.computer_setup_id else :computerSetupId end) " +
+            "and u.user_id = (case when :userId is null then u.user_id else :userId end)")
+    List<ComputerSetupModel> getByCustomParam(@Param("computerSetupId") Integer computerSetupId, @Param("userId") Integer userId);
 
 }

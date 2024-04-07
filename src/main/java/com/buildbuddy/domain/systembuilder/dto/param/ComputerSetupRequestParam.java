@@ -17,4 +17,6 @@ import java.util.List;
 public class ComputerSetupRequestParam {
 
     private Integer computerSetupId;
+
+    private Integer userId;
 }
