@@ -44,7 +44,7 @@ public class SystemBuilderService {
 
     public DataResponse<ComputerSetupResponseSchema> get(ComputerSetupRequestParam requestParam){
 
-        List<ComputerSetupModel> computerSetupList = computerSetupRepository.getByCustomParam(requestParam.getComputerSetupId());
+        List<ComputerSetupModel> computerSetupList = computerSetupRepository.getByCustomParam(requestParam.getComputerSetupId(), requestParam.getUserId());
 
         List<ComputerSetupResponseDto> computerSetupResponseDtos = computerSetupList.stream()
                 .map(ComputerSetupResponseDto::convertToDto)
