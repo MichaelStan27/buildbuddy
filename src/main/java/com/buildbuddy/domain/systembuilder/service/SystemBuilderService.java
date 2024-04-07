@@ -6,6 +6,7 @@ import com.buildbuddy.domain.systembuilder.dto.request.ComputerSetupRequestDto;
 import com.buildbuddy.domain.systembuilder.dto.response.computerSetup.ComputerSetupResponseDto;
 import com.buildbuddy.domain.systembuilder.dto.response.computerSetup.ComputerSetupResponseSchema;
 import com.buildbuddy.domain.systembuilder.entity.ComputerSetupEntity;
+import com.buildbuddy.domain.systembuilder.entity.ComputerSetupModel;
 import com.buildbuddy.domain.systembuilder.repository.ComputerSetupRepository;
 import com.buildbuddy.domain.user.entity.UserEntity;
 import com.buildbuddy.exception.BadRequestException;
@@ -43,21 +44,7 @@ public class SystemBuilderService {
 
     public DataResponse<ComputerSetupResponseSchema> get(ComputerSetupRequestParam requestParam){
 
-        // pagination and sort
-        // ===========
-        boolean isPaginated = requestParam.isPagination();
-        Integer pageNo = requestParam.getPageNo();
-        Integer pageSize = requestParam.getPageSize();
-        String sortBy = requestParam.getSortBy();
-        String sortDirection = requestParam.getSortDirection();
-
-        Sort sort = paginationCreator.createSort(sortDirection, sortBy);
-
-        Pageable pageable = paginationCreator.createPageable(isPaginated, sort, pageNo, pageSize);
-        // ===========
-
-        Page<ComputerSetupEntity> dataPage = getComputerFromDB(requestParam, pageable);
-        List<ComputerSetupEntity> computerSetupList = dataPage.getContent();
+        List<ComputerSetupModel> computerSetupList = computerSetupRepository.getByCustomParam(requestParam.getComputerSetupId());
 
         List<ComputerSetupResponseDto> computerSetupResponseDtos = computerSetupList.stream()
                 .map(ComputerSetupResponseDto::convertToDto)
@@ -65,10 +52,6 @@ public class SystemBuilderService {
 
         ComputerSetupResponseSchema data = ComputerSetupResponseSchema.builder()
                 .computerSetupList(computerSetupResponseDtos)
-                .pageNo(pageNo)
-                .pageSize(pageSize)
-                .totalPages(dataPage.getTotalPages())
-                .totalData(dataPage.getTotalElements())
                 .build();
 
         return DataResponse.<ComputerSetupResponseSchema>builder()
@@ -78,21 +61,6 @@ public class SystemBuilderService {
                 .data(data)
                 .build();
 
-    }
-
-    private Page<ComputerSetupEntity> getComputerFromDB(ComputerSetupRequestParam param, Pageable pageable){
-
-        log.info("Getting computer from DB...");
-
-        List<ParamFilter> paramFilters = param.getFilters();
-        Page<ComputerSetupEntity> data = null;
-
-        if(paramFilters.isEmpty())
-            data = computerSetupRepository.findAll(pageable);
-        else
-            data = computerSetupRepository.findAll(specificationCreator.getSpecification(paramFilters), pageable);
-
-        return data;
     }
 
     @Transactional
