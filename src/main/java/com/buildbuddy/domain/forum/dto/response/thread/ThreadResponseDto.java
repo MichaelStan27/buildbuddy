@@ -45,10 +45,12 @@ public class ThreadResponseDto {
     private LocalDateTime lastUpdateTime;
 
     public static ThreadResponseDto convertToDto(ThreadEntity entity){
+        byte[] profile = entity.getUser().getProfilePicture();
         return ThreadResponseDto.builder()
                 .threadId(entity.getId())
                 .post(entity.getPost())
                 .username(entity.getUser().getUsername())
+                .userProfile(profile != null ? Base64.getEncoder().encodeToString(profile) : null)
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .totalLike(0)
