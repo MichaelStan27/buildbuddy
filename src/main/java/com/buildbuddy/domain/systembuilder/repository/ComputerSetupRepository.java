@@ -15,8 +15,8 @@ public interface ComputerSetupRepository extends JpaRepository<ComputerSetupEnti
 
 
     @Query(nativeQuery = true, value = "select cs.computer_setup_id as computerSetupId, " +
-            "cc.computer_case_id as caseId, cc.name as caseName, cc.image as image, " +
-            "c.cooler_id as coolerId, c.name as coolerName, c.image as image, " +
+            "cc.computer_case_id as caseId, cc.name as caseName, cc.image as caseImage, " +
+            "c.cooler_id as coolerId, c.name as coolerName, c.image as coolerImage, " +
             "gc.graphics_card_id as graphicsCardId, gc.name as graphicsCardName, gc.image as graphicsCardImage, " +
             "m.monitor_id as monitorId, m.name as monitorName, m.image as monitorImage, " +
             "mo.motherboard_id as motherboardId, mo.name as motherboardName, mo.image as motherboardImage, " +
