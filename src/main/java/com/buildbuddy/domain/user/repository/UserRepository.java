@@ -24,6 +24,7 @@ public interface UserRepository extends JpaRepository<UserEntity, Integer> {
     Optional<UserEntity> findByConsultantId(@Param("consultantId") Integer consultantId);
 
     Optional<UserEntity> findByUsername(String username);
+    Optional<UserEntity> findByEmail(String email);
 
     // Only for audit purpose, dont user for other purpose
     @Transactional(Transactional.TxType.REQUIRES_NEW)

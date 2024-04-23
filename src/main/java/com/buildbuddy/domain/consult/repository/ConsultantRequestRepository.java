@@ -31,6 +31,8 @@ public interface ConsultantRequestRepository extends JpaRepository<ConsultantReq
 
     Optional<ConsultantRequest> findByUsername(String username);
 
+    Optional<ConsultantRequest> findByEmail(String email);
+
     @Query(nativeQuery = true, value = "select * from consultant_request " +
             "where reviewed_by like (case when :search is null then reviewed_by else :search end) " +
             "or username like (case when :search is null then username else :search end) " +

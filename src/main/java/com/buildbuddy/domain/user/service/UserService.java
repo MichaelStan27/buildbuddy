@@ -135,6 +135,18 @@ public class UserService {
                 user.setConsultantDetail(consultantDetail);
             }
             else{
+                Optional<UserEntity> username = userRepository.findByUsername(userDto.getUsername());
+                if(username.isPresent()) throw new RuntimeException("Username is already taken");
+
+                Optional<UserEntity> email = userRepository.findByEmail(userDto.getEmail());
+                if (email.isPresent()) throw new RuntimeException("Email is already taken");
+
+                Optional<ConsultantRequest> consultantRequestUsername = consultantRequestRepository.findByUsername(userDto.getUsername());
+                if(consultantRequestUsername.isPresent()) throw new RuntimeException("username is already taken");
+
+                Optional<ConsultantRequest> consultantRequestEmail = consultantRequestRepository.findByEmail(userDto.getEmail());
+                if(consultantRequestEmail.isPresent()) throw new RuntimeException("Email is already taken");
+
                 user = UserEntity.builder()
                         .username(userDto.getUsername())
                         .email(userDto.getEmail())
@@ -150,6 +162,13 @@ public class UserService {
         else {
             log.info("Updating user");
             user = userRepository.findById(userDto.getUserId()).orElseThrow(() -> new RuntimeException("User Not Found"));
+            if (userDto.getEmail() != null && !user.getEmail().equals(userDto.getEmail())) {
+                Optional<UserEntity> email = userRepository.findByEmail(userDto.getEmail());
+                if (email.isPresent()) throw new RuntimeException("Email is already taken");
+
+                Optional<ConsultantRequest> consultantRequestEmail = consultantRequestRepository.findByEmail(userDto.getEmail());
+                if(consultantRequestEmail.isPresent()) throw new RuntimeException("Email is already taken");
+            }
             user.updateDetail(userDto);
         }
 
