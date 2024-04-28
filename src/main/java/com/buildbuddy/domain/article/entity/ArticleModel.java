@@ -9,7 +9,7 @@ public interface ArticleModel {
     Integer getUserId();
     String getTitle();
     String getPost();
-    String getStatus();
+
     byte[] getImage();
     Integer getTotalLike();
     long getIsLikedByUser();
