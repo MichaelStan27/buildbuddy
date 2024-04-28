@@ -160,6 +160,7 @@ public class ArticleService {
 
     }
 
+    @Transactional
     public DataResponse<Object> like(ArticleLikeDto dto){
         UserEntity user = audit.getCurrentAuditor().orElseThrow(() -> new RuntimeException("User Not Found"));
 
