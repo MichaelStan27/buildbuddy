@@ -28,9 +28,6 @@ public class ArticleResponseDto {
     private String post;
 
     @JsonProperty
-    private String status;
-
-    @JsonProperty
     private String image;
 
     @JsonProperty
@@ -59,7 +56,6 @@ public class ArticleResponseDto {
                 .articleId(entity.getId())
                 .title(entity.getTitle())
                 .post(entity.getPost())
-                .status(entity.getStatus())
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .totalLike(0)
                 .isLikedByUser(false)
@@ -76,7 +72,6 @@ public class ArticleResponseDto {
                 .articleId(entity.getArticleId())
                 .title(entity.getTitle())
                 .post(entity.getPost())
-                .status(entity.getStatus())
                 .image(image != null ? Base64.getEncoder().encodeToString(image) : null)
                 .username(entity.getUsername())
                 .totalLike(entity.getTotalLike())
