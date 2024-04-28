@@ -24,7 +24,6 @@ public interface ArticleRepository extends JpaRepository<ArticleEntity, Integer>
                 "and (u.username like (case when :search is null then u.username else :search end) " +
                 "or a.title like (case when :search is null then a.title else :search end) " +
                 "or a.post like (case when :search is null then a.post else :search end) " +
-                "or a.status like (case when :search is null then a.status else :search end) " +
                 ")")
         Page<ArticleModel> getByCustomParam(@Param("userId") Integer userId,
                                             @Param("articleId") Integer articleId,
