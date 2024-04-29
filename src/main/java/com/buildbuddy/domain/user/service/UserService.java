@@ -141,10 +141,10 @@ public class UserService {
                 Optional<UserEntity> email = userRepository.findByEmail(userDto.getEmail());
                 if (email.isPresent()) throw new RuntimeException("Email is already taken");
 
-                Optional<ConsultantRequest> consultantRequestUsername = consultantRequestRepository.findByUsername(userDto.getUsername());
+                Optional<String> consultantRequestUsername = consultantRequestRepository.getByUsername(userDto.getUsername());
                 if(consultantRequestUsername.isPresent()) throw new RuntimeException("username is already taken");
 
-                Optional<ConsultantRequest> consultantRequestEmail = consultantRequestRepository.findByEmail(userDto.getEmail());
+                Optional<String> consultantRequestEmail = consultantRequestRepository.getByEmail(userDto.getEmail());
                 if(consultantRequestEmail.isPresent()) throw new RuntimeException("Email is already taken");
 
                 user = UserEntity.builder()
