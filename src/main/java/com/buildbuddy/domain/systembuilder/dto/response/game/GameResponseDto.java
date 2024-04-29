@@ -65,6 +65,7 @@ public class GameResponseDto {
                 .graphicsCard(entity.getGraphicsCard())
                 .cpuBenchmark(entity.getCpuBenchmark())
                 .cpu(entity.getCpu())
+                .memory(entity.getMemory())
                 .fileSize(entity.getFileSize())
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())

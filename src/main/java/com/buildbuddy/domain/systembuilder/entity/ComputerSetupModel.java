@@ -18,6 +18,7 @@ public interface ComputerSetupModel {
 
     Integer getGraphicsCardId();
     String getGraphicsCardName();
+    Integer getGraphicsCardBenchmark();
     byte[] getGraphicsCardImage();
 
     Integer getMonitorId();
@@ -34,14 +35,17 @@ public interface ComputerSetupModel {
 
     Integer getProcessorId();
     String getProcessorName();
+    Integer getProcessorBenchmark();
     byte[] getProcessorImage();
 
     Integer getRamId();
     String getRamName();
+    Integer getRamSize();
     byte[] getRamImage();
 
     Integer getStorageId();
     String getStorageName();
+    Integer getStorageSize();
     byte[] getStorageImage();
 
     String getUsername();

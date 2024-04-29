@@ -50,6 +50,9 @@ public class ComputerSetupResponseDto {
     private String graphicsCardName;
 
     @JsonProperty
+    private Integer graphicsCardBenchmark;
+
+    @JsonProperty
     private String graphicsCardImage;
 
     @JsonProperty
@@ -86,6 +89,9 @@ public class ComputerSetupResponseDto {
     private String processorName;
 
     @JsonProperty
+    private Integer processorBenchmark;
+
+    @JsonProperty
     private String processorImage;
 
     @JsonProperty
@@ -98,10 +104,16 @@ public class ComputerSetupResponseDto {
     private String ramImage;
 
     @JsonProperty
+    private Integer ramSize;
+
+    @JsonProperty
     private Integer storageId;
 
     @JsonProperty
     private String storageName;
+
+    @JsonProperty
+    private Integer storageSize;
 
     @JsonProperty
     private String storageImage;
@@ -149,6 +161,7 @@ public class ComputerSetupResponseDto {
                 .coolerImage(convertByteToImage(entity.getCoolerImage()))
                 .graphicsCardId(entity.getGraphicsCardId())
                 .graphicsCardName(entity.getGraphicsCardName())
+                .graphicsCardBenchmark(entity.getGraphicsCardBenchmark())
                 .graphicsCardImage(convertByteToImage(entity.getGraphicsCardImage()))
                 .monitorId(entity.getMonitorId())
                 .monitorName(entity.getMonitorName())
@@ -161,12 +174,15 @@ public class ComputerSetupResponseDto {
                 .powersupplyImage(convertByteToImage(entity.getPowersupplyImage()))
                 .processorId(entity.getProcessorId())
                 .processorName(entity.getProcessorName())
+                .processorBenchmark(entity.getProcessorBenchmark())
                 .processorImage(convertByteToImage(entity.getProcessorImage()))
                 .ramId(entity.getRamId())
                 .ramName(entity.getRamName())
+                .ramSize(entity.getRamSize())
                 .ramImage(convertByteToImage(entity.getRamImage()))
                 .storageId(entity.getStorageId())
                 .storageName(entity.getStorageName())
+                .storageSize(entity.getStorageSize())
                 .storageImage(convertByteToImage(entity.getStorageImage()))
                 .username(entity.getUsername())
                 .totalPrice(entity.getTotalPrice())
