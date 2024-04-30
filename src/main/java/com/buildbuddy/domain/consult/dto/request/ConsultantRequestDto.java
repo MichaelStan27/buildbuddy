@@ -24,4 +24,6 @@ public class ConsultantRequestDto {
 
     private String status;
 
+    private String fileBase64;
+
 }
