@@ -12,6 +12,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Data
 @Entity
@@ -55,6 +56,9 @@ public class ConsultantRequest {
     @Column(name = "reviewed_by")
     private String reviewedBy;
 
+    @Column(name = "file")
+    private byte[] file;
+
     public static ConsultantRequest convertToEntity(ConsultantRequestDto dto){
         LocalDateTime time = LocalDateTime.now();
         return ConsultantRequest.builder()
@@ -65,6 +69,7 @@ public class ConsultantRequest {
                 .status(ConsultantRequestStatus.PENDING.getValue())
                 .createdTime(time)
                 .lastUpdateTime(time)
+                .file(Base64.getDecoder().decode(dto.getFileBase64()))
                 .build();
     }
 }

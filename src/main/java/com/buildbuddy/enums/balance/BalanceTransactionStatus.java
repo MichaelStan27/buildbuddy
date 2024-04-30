@@ -8,8 +8,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum BalanceTransactionStatus {
 
-    PENDING("PENDING"),
-    REJECTED("REJECTED"),
     ON_HOLD("ON_HOLD"),
     RETURNED("RETURNED"),
     DEDUCTED("DEDUCTED"),

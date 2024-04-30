@@ -12,6 +12,7 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 
 @Data
 @Builder
@@ -51,6 +52,9 @@ public class ConsultantRequestResDto {
     @JsonProperty
     private String reviewedBy;
 
+    @JsonProperty
+    private String fileBase64;
+
     public static ConsultantRequestResDto convertToDto(ConsultantRequest entity){
         return ConsultantRequestResDto.builder()
                 .requestId(entity.getId())
@@ -63,6 +67,7 @@ public class ConsultantRequestResDto {
                 .createdTime(entity.getCreatedTime())
                 .lastUpdateTime(entity.getLastUpdateTime())
                 .reviewedBy(entity.getReviewedBy())
+                .fileBase64(entity.getFile() != null ? Base64.getEncoder().encodeToString(entity.getFile()) : null)
                 .build();
     }
 
